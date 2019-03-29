@@ -21,8 +21,17 @@ void Controller::execute_cmd(int cmd){
         case 3:
             user_to_mod();
             break;
-        case 5:
+        case 4:
             view.view_current_users();
+            break;
+        case 5:
+            create_chatroom();
+            break;
+        case 6:
+            view.view_chatrooms();
+            break;
+        case 7: 
+            add_user_to_chatroom();
             break;
     }
 }
@@ -34,6 +43,48 @@ void Controller::create_user(){
     User* user = new User();
     user->setUsername(username);
     server.add_user(user);
+}
+
+void Controller::add_user_to_chatroom(){
+    string username, chatroom_name;
+    User* user;
+    bool foundChat = false;
+    bool foundUser = false;
+
+    view.username_prompt();
+    cin >> username;
+     
+    for(auto x : server.get_users()){
+        if(x->getUsername() == username){
+            User* user = x;
+            foundUser = true;
+            break;
+        }
+    }
+
+    if(!foundUser){
+        cout << "No user found.\n" << endl;
+    }
+    else{
+        view.chatroom_name_prompt();
+        cin >> chatroom_name;
+
+        for(auto x : server.get_chatrooms()){
+            if(x.first->get_name() == chatroom_name){
+                x.first->add_user(user);
+                x.second++;
+                foundChat = true;
+                break;
+            }
+        }
+
+        if(!foundChat){
+            cout << "Chatroom not found.\n" << endl;
+        }
+    }
+
+
+    
 }
 
 void Controller::remove_user(){
@@ -80,4 +131,13 @@ void Controller::user_to_mod(){
         view.no_user_prompt();
     }
 
+}
+
+void Controller::create_chatroom(){
+    string name;
+    view.chatroom_name_prompt();
+    cin >> name;
+    Chatroom* chatroom = new Chatroom();
+    chatroom->set_name(name);
+    server.add_chatroom(chatroom);
 }

@@ -8,6 +8,17 @@ void Server::add_user(User* user){
     users.push_back(user);
 }
 
+void Server::add_chatroom(Chatroom* chatroom){
+    chatrooms.insert(pair<Chatroom*,int>(chatroom,0));
+}
+
+string Server::display_chatrooms(){
+    ostringstream output;
+    for (auto x: chatrooms){
+        output << (*(x.first)).to_string() << ", Num Users: " << x.second <<endl;
+    }
+    return output.str();
+}
 string Server::display_users(){
     ostringstream output;
     for (auto x : users){
@@ -31,4 +42,8 @@ void Server::remove_user(int position){
 
 vector<User*> Server::get_users(){
     return users;
+}
+
+map<Chatroom*, int> Server::get_chatrooms(){
+    return chatrooms;
 }
