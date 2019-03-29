@@ -1,3 +1,6 @@
+#ifndef USER_H
+#define USER_H
+
 #include <stdio.h>
 #include <iostream>
 
@@ -28,3 +31,5 @@ class User{
             bool canOb;
 
 };
+
+#endif

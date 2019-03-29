@@ -8,6 +8,8 @@ class Controller{
         void create_user();
         void remove_user();
         void user_to_mod();
+        void create_chatroom();
+        void add_user_to_chatroom();
 
     private: 
         Server& server;

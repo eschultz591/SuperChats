@@ -7,8 +7,8 @@ class View{
         void username_prompt();
         void view_current_users();
         void no_user_prompt();
-
-
+        void chatroom_name_prompt();
+        void view_chatrooms();
     private: 
         Server& server;
 };
