@@ -56,7 +56,7 @@ void Controller::add_user_to_chatroom(){
      
     for(auto x : server.get_users()){
         if(x->getUsername() == username){
-            User* user = x;
+            user = x;
             foundUser = true;
             break;
         }
