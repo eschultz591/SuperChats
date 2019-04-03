@@ -13,6 +13,7 @@ SUPER CHAT
 5) Create a chatroom
 6) View Chatrooms
 7) Add user to chat
+8) Remove Chatroom
 
 )";
 

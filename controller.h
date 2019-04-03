@@ -10,6 +10,7 @@ class Controller{
         void user_to_mod();
         void create_chatroom();
         void add_user_to_chatroom();
+        void remove_chatroom();
 
     private: 
         Server& server;

@@ -33,6 +33,9 @@ void Controller::execute_cmd(int cmd){
         case 7: 
             add_user_to_chatroom();
             break;
+        case 8:
+            remove_chatroom();
+            break;
     }
 }
 
@@ -69,10 +72,10 @@ void Controller::add_user_to_chatroom(){
         view.chatroom_name_prompt();
         cin >> chatroom_name;
 
-        for(auto x : server.get_chatrooms()){
+        for(auto&& x : server.get_chatrooms()){
             if(x.first->get_name() == chatroom_name){
                 x.first->add_user(user);
-                x.second++;
+                server.get_chatrooms().at(x.first) += 1;
                 foundChat = true;
                 break;
             }
@@ -82,9 +85,6 @@ void Controller::add_user_to_chatroom(){
             cout << "Chatroom not found.\n" << endl;
         }
     }
-
-
-    
 }
 
 void Controller::remove_user(){
@@ -97,6 +97,7 @@ void Controller::remove_user(){
     for(auto x : server.get_users()){
         if (x->getUsername() == username){
             foundUser = true;
+            delete x;
             break;
         }
         else{
@@ -124,13 +125,11 @@ void Controller::user_to_mod(){
             foundUser = true;
             x->setMod();
             break;
-        }
-        
+        }      
     }
     if (!foundUser){
         view.no_user_prompt();
     }
-
 }
 
 void Controller::create_chatroom(){
@@ -140,4 +139,25 @@ void Controller::create_chatroom(){
     Chatroom* chatroom = new Chatroom();
     chatroom->set_name(name);
     server.add_chatroom(chatroom);
+}
+
+
+//Deletes users from chatroom, removes chatroom from server, then deletes chatroom object
+void Controller::remove_chatroom(){
+    string chatroom_name;
+    int position = 0;
+    bool foundChat = false;
+    view.chatroom_name_prompt();
+    cin >> chatroom_name;
+
+    for(auto x : server.get_chatrooms()){
+        if (x.first->get_name() == chatroom_name){
+            foundChat = true;
+            server.remove_chatroom(x.first);
+            break;
+        }
+    }
+    if(!foundChat){
+        cout << "Chatroom not found.\n" << endl;
+    }
 }

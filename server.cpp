@@ -44,6 +44,13 @@ vector<User*> Server::get_users(){
     return users;
 }
 
-map<Chatroom*, int> Server::get_chatrooms(){
+map<Chatroom*, int> &Server::get_chatrooms(){
     return chatrooms;
-}
+} 
+
+//erases chatroom from server, but doesn't deallocate Users MUST FIX
+void Server::remove_chatroom(Chatroom* chatroom){
+    users = chatroom->get_current_users();
+    chatrooms.erase(chatroom);
+    delete chatroom;
+} 
