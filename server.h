@@ -14,7 +14,8 @@ class Server{
         vector<User*> get_users();
         void add_chatroom(Chatroom*);
         string display_chatrooms();
-        map<Chatroom*, int> get_chatrooms();
+        map<Chatroom*, int> &get_chatrooms();
+        void remove_chatroom(Chatroom*);
     private: 
         vector<User*> users;
         map<Chatroom*, int> chatrooms; 

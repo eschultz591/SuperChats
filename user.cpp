@@ -51,3 +51,15 @@ bool User::getOb(){
 void User::setOb(){
     canOb = true;
 }
+
+void User::downgradeAdmin(){
+    isAdmin = false;
+}
+
+void User::downgradeMod(){
+    isMod = false;
+}
+
+void User::downgradeOb(){
+    canOb = false;
+}

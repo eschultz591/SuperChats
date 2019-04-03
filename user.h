@@ -22,6 +22,9 @@ class User{
         void setAdmin();
         void setBanned();
         void setOb();
+        void downgradeMod();
+        void downgradeAdmin();
+        void downgradeOb();
 
         private: 
             string username;
