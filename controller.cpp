@@ -44,6 +44,8 @@ void Controller::interface(){
 
 void Controller::execute_cmd(int cmd){
     switch(cmd){
+        case 0:
+            break;
         case 1:
             create_user();
             break;
