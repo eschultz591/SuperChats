@@ -31,7 +31,7 @@ string Server::display_users(){
 string Server::display_users2(){
     ostringstream output;
     for (auto x : users){
-        output << "Username: " << x->getUsername() << ", Moderator: " << x->getMod()<< ", Admin: " << x->getAdmin() << ", Can Obfuscate: " << x->getOb() << endl;
+        output << "Username: " << x->getUsername() << ", Moderator: " << x->getMod()<< ", Admin: " << x->getAdmin() << ", Can Obfuscate: " << x->getOb() << ", Current Chatroom: " << x->get_room() << endl;
     }
     return output.str();
 }

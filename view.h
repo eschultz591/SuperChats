@@ -9,6 +9,8 @@ class View{
         void no_user_prompt();
         void chatroom_name_prompt();
         void view_chatrooms();
+        void chatroom_not_found_prompt();
+        void invalid_entry();
     private: 
         Server& server;
 };

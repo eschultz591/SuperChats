@@ -1,5 +1,6 @@
 #include "user.h"
 #include "chatroom.h"
+#include "message.h"
 #include <vector>
 #include <sstream>
 #include <map>
@@ -18,6 +19,7 @@ class Server{
         void remove_chatroom(Chatroom*);
     private: 
         vector<User*> users;
-        map<Chatroom*, int> chatrooms; 
+        map<Chatroom*, int> chatrooms;
+        vector<Message*> messages;
 
 };

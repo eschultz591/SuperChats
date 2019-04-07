@@ -6,6 +6,7 @@ User::User(){
     isAdmin = false;
     isBanned = false;
     canOb = false;
+    current_chatroom = "none";
 }
 
 string User::getUsername(){
@@ -62,4 +63,12 @@ void User::downgradeMod(){
 
 void User::downgradeOb(){
     canOb = false;
+}
+
+void User::set_room(string cc){
+    current_chatroom = cc;
+}
+
+string User::get_room(){
+    return current_chatroom; 
 }

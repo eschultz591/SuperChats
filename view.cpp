@@ -7,13 +7,14 @@ SUPER CHAT
 ==========
 
 1) Create User
-2) Remove User
+2) Remove User from server (Admin priviledge)
 3) Bump User to Mod Status
 4) See Current Users
 5) Create a chatroom
 6) View Chatrooms
 7) Add user to chat
 8) Remove Chatroom
+9) Remove User from a chatroom (Mod priviledge)
 
 )";
 
@@ -52,4 +53,11 @@ void View::no_user_prompt(){
 
 void View::chatroom_name_prompt(){
     cout << "Enter a chatroom name: ";
+}
+void View::chatroom_not_found_prompt(){
+    cout << "Chatroom not found.\n";
+}
+
+void View::invalid_entry(){
+    cout << "Invalid input. Please select a correct option.\n";
 }
