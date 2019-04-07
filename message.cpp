@@ -9,9 +9,13 @@ void Message::set_message(string m){
 }
 
 int Message::get_time(){
-    return time;
+    return _time;
 }
 
 void Message::set_time(int t){
-    time = t;
+    _time = t;
 }
+
+string Message::to_string(){
+    return "Time: " + std::to_string(_time) + ", Message: " + message + "\n";
+}  

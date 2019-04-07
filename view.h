@@ -11,6 +11,8 @@ class View{
         void view_chatrooms();
         void chatroom_not_found_prompt();
         void invalid_entry();
+        void message_prompt();
+        void display_messages(Chatroom*);
     private: 
         Server& server;
 };

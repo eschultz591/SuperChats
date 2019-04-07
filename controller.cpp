@@ -71,6 +71,12 @@ void Controller::execute_cmd(int cmd){
         case 9:
             boot_user_to_lobby();
             break;
+        case 10:
+            add_message();
+            break;
+        case 11:
+            display_messages();
+            break;
         default: 
             view.invalid_entry();
             break;
@@ -93,6 +99,13 @@ User* Controller::create_user_first_time(){
     cin >> username;
     User* user = new User();
     user->setUsername(username);
+
+    //first user to log into server becomes admin
+    int size = server.getUsers().size();
+    if (size == 0){
+        user->setAdmin();
+    }
+    
     server.add_user(user);
     return user;
 }
@@ -292,6 +305,49 @@ void Controller::boot_user_to_lobby(){
 
     if(!user_found){
         view.no_user_prompt();
+    }
+    if(!chatroom_found){
+        view.chatroom_not_found_prompt();
+    }
+}
+
+void Controller::add_message(){
+    string text;
+    string full_message;
+    string what_room_are_we_in;
+    bool foundChat = false;
+    static int t = 1;
+    view.message_prompt();
+    cin.ignore();
+    std::getline(cin, text);
+    //cin >> text;
+
+    view.chatroom_name_prompt();
+    cin >> what_room_are_we_in;
+    
+    Message* m = new Message(text, t);
+    full_message = m->to_string();
+    delete m;
+
+    for(auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == what_room_are_we_in){
+            x.first->add_message(full_message);
+        }
+    }
+    t++;
+}
+
+void Controller::display_messages(){
+    string chatroom_name;
+    bool chatroom_found = false;
+    view.chatroom_name_prompt();
+    cin >> chatroom_name;
+    for(auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == chatroom_name){
+            view.display_messages(x.first); 
+            chatroom_found = true;
+            break;
+        }
     }
     if(!chatroom_found){
         view.chatroom_not_found_prompt();

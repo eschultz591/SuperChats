@@ -1,5 +1,6 @@
 #include "user.h"
 #include <vector>
+#include "message.h"
 
 class Chatroom{
     public: 
@@ -14,6 +15,8 @@ class Chatroom{
         void add_user(User*);
         friend string get_name_for_friend();
         void remove_user(string);
+        void add_message(string);
+        vector<string> get_messages();
         
 
     private: 

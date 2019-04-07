@@ -15,6 +15,8 @@ SUPER CHAT
 7) Add user to chat
 8) Remove Chatroom
 9) Remove User from a chatroom (Mod priviledge)
+10) Add Message
+11) View messages
 
 )";
 
@@ -47,6 +49,22 @@ XXXXXXXXX
     cout << header;
 }
 
+void View::display_messages(Chatroom* chatroom){
+
+    string header = R"(
+XXXXXXXX
+MESSAGES
+XXXXXXXX
+
+)";
+    for(auto x : chatroom->get_messages()){
+        header += x;
+        header += "\n";
+    }
+    cout << header;
+    
+}
+
 void View::no_user_prompt(){
     cout << "No user found.\n";
 }
@@ -60,4 +78,8 @@ void View::chatroom_not_found_prompt(){
 
 void View::invalid_entry(){
     cout << "Invalid input. Please select a correct option.\n";
+}
+
+void View::message_prompt(){
+    cout << "Enter message: ";
 }

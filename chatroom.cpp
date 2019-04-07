@@ -61,3 +61,11 @@ void Chatroom::remove_user(string username){
         cout << "User not in chatroom.\n";
     }
 }
+
+void Chatroom::add_message(string message){
+    messages.push_back(message);
+}
+
+vector<string> Chatroom::get_messages(){
+    return messages;
+}
