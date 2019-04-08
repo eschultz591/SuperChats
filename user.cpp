@@ -1,4 +1,5 @@
 #include "user.h"
+#include "server.h"
 
 User::User(){
     username = "XXX";
@@ -6,7 +7,6 @@ User::User(){
     isAdmin = false;
     isBanned = false;
     canOb = false;
-    current_chatroom = "none";
 }
 
 string User::getUsername(){
@@ -51,24 +51,4 @@ bool User::getOb(){
 
 void User::setOb(){
     canOb = true;
-}
-
-void User::downgradeAdmin(){
-    isAdmin = false;
-}
-
-void User::downgradeMod(){
-    isMod = false;
-}
-
-void User::downgradeOb(){
-    canOb = false;
-}
-
-void User::set_room(string cc){
-    current_chatroom = cc;
-}
-
-string User::get_room(){
-    return current_chatroom; 
 }
