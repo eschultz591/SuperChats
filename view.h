@@ -9,6 +9,8 @@ class View{
         void no_user_prompt();
         void chatroom_name_prompt();
         void view_chatrooms();
+	void no_privileges_prompt(); // (JB)
+        void maxed_users_prompt(); // (JB)
     private: 
         Server& server;
 };

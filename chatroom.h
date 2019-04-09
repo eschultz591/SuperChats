@@ -12,6 +12,8 @@ class Chatroom{
         void increment_num_users();
         string to_string();
         void add_user(User*);
+	bool checkNumUsers(); // (JB)
+	bool checkChatName(); // (JB)
 
     private: 
         string name;

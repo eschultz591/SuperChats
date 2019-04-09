@@ -38,3 +38,24 @@ void Chatroom::increment_num_users(){
 void Chatroom::add_user(User* user){
     current_users.push_back(user);
 }
+
+// (JB)
+// validate number of users in a chatroom
+bool Chatroom::checkNumUsers() {
+    if (current_users.size() > 10)
+	return true;
+    else
+	return false;
+}
+
+// (JB)
+// validate chatroom name
+bool Chatroom::checkChatName(String chatroom) {
+    for (auto x : server.get_chatrooms()) {
+	if (x.first->get_name() == chatroom_name) {
+	    return true;
+	else
+	    return false;
+	}
+    }
+}

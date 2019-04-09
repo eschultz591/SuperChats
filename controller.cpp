@@ -36,6 +36,9 @@ void Controller::execute_cmd(int cmd){
         case 8:
             remove_chatroom();
             break;
+	case 9:
+	    edit_username(); // (JB)
+	    break;
     }
 }
 
@@ -43,6 +46,9 @@ void Controller::create_user(){
     string username;
     view.username_prompt();
     cin >> username;
+    // validate username (JB)
+    if (user.checkUsername(username) == true)
+	throw runtime_error{"Invalid username.\n"};
     User* user = new User();
     user->setUsername(username);
     server.add_user(user);
@@ -73,10 +79,14 @@ void Controller::add_user_to_chatroom(){
         cin >> chatroom_name;
 
         for(auto&& x : server.get_chatrooms()){
-            if(x.first->get_name() == chatroom_name){
-                x.first->add_user(user);
-                server.get_chatrooms().at(x.first) += 1;
-                foundChat = true;
+            if (x.first->get_name() == chatroom_name) {
+		if (chatroom.checkNumUsers() == true) // (JB)
+		    view.maxed_users_prompt();
+		else {
+                    x.first->add_user(user);
+                    server.get_chatrooms().at(x.first) += 1;
+                    foundChat = true;
+		}
                 break;
             }
         }
@@ -136,6 +146,12 @@ void Controller::create_chatroom(){
     string name;
     view.chatroom_name_prompt();
     cin >> name;
+    // validate chatroom name (JB)
+    if (chatroom.checkChatName(name) == true)
+	throw runtime_error{"Chatroom name already exists."};
+    // validate for number of chatrooms (JB)
+    if (server.checkNumChatrooms() == true)
+	throw runtime_error{"Chatroom limit reached. Delete a chatroom to create a new one."};
     Chatroom* chatroom = new Chatroom();
     chatroom->set_name(name);
     server.add_chatroom(chatroom);
@@ -159,5 +175,24 @@ void Controller::remove_chatroom(){
     }
     if(!foundChat){
         cout << "Chatroom not found.\n" << endl;
+    }
+}
+
+// (JB)
+void Controller::edit_username() {
+    string current_username, new_username;
+    view.username_prompt();
+    cin >> current_username;
+    for (auto x : server.get_users()) {
+        if(current_username == x->getUsername()) {
+            cout << "New username: ";
+            cin >> new_username;
+
+            // validate new username
+            if (User.checkUsername(new_username) == false)
+                 throw runtime_error{"Invalid username.\n"};
+
+            x->setUsername(new_username);
+        }
     }
 }

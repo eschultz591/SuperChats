@@ -10,7 +10,7 @@ class User{
     public: 
         User();
         User(string u_n, bool mod, bool ad, bool ban, bool ob): username(u_n), isMod(mod), isAdmin(ad), isBanned(ban), canOb(ob){};
-        void checkUsername(string);
+        bool checkUsername(string);
         void editUsername(string);
         string getUsername();
         bool getMod();
@@ -25,6 +25,7 @@ class User{
         void downgradeMod();
         void downgradeAdmin();
         void downgradeOb();
+	void banUser();
 
         private: 
             string username;

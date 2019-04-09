@@ -19,6 +19,7 @@ string Server::display_chatrooms(){
     }
     return output.str();
 }
+
 string Server::display_users(){
     ostringstream output;
     for (auto x : users){
@@ -53,4 +54,41 @@ void Server::remove_chatroom(Chatroom* chatroom){
     users = chatroom->get_current_users();
     chatrooms.erase(chatroom);
     delete chatroom;
-} 
+}
+
+// (JB)
+// validate number of users on the server
+bool Server::checkNumUsers() {
+    // server cannot exceed more than 50 users
+    if (users.size() > 50)
+	return true;
+    else
+	return false;
+}
+
+// (JB)
+bool Server::checkNumChatrooms() {
+    // server cannot exceed more than 10 chatrooms
+    if (chatrooms.size() > 10)
+	return true;
+    else
+	return false;
+}
+
+// (JB)
+int Server::getNumUsers() {return user.size();}
+
+// (JB)
+int Server::getNumChatrooms() {return chatrooms.size();}
+
+// (JB)
+int Server::getNumModerators() {
+    string num_mod;
+    for (auto x : get_users()) {
+	x->getUsername();
+	if (isMod == true) {
+	    num_mod++;
+	}
+    }
+    return num_mod;
+}

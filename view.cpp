@@ -14,6 +14,7 @@ SUPER CHAT
 6) View Chatrooms
 7) Add user to chat
 8) Remove Chatroom
+9) Edit username // (JB)
 
 )";
 
@@ -53,3 +54,14 @@ void View::no_user_prompt(){
 void View::chatroom_name_prompt(){
     cout << "Enter a chatroom name: ";
 }
+
+// (JB)
+void View::no_privileges_prompt() {
+    cout << "Must have moderator or admin privileges.\n";
+}
+
+// (JB)
+void View::maxed_users_prompt() {
+    cout << "Maxed users reached. Try again later.\n";
+}
+
