@@ -13,6 +13,7 @@ class View{
         void invalid_entry();
         void message_prompt();
         void display_messages(Chatroom*);
+        void maxed_users_prompt();
     private: 
         Server& server;
 };

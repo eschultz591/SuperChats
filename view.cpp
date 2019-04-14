@@ -83,3 +83,7 @@ void View::invalid_entry(){
 void View::message_prompt(){
     cout << "Enter message: ";
 }
+
+void View::maxed_users_prompt(){
+    cout << "Maxed users reached. Try again later.\n";
+}

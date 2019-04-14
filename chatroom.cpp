@@ -69,3 +69,13 @@ void Chatroom::add_message(string message){
 vector<string> Chatroom::get_messages(){
     return messages;
 }
+
+bool Chatroom::checkNumUsers() {
+    if (current_users.size() > 10)
+	return true;
+    else
+	return false;
+}
+
+// (JB)
+// validate chatroom name

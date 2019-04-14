@@ -54,3 +54,10 @@ void Server::remove_chatroom(Chatroom* chatroom){
     chatrooms.erase(chatroom);
     delete chatroom;
 } 
+
+bool Server::checkNumChatrooms(){
+    if (chatrooms.size() == 10)
+	return true;
+    else
+	return false;
+}

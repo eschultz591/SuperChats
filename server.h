@@ -17,6 +17,7 @@ class Server{
         string display_chatrooms();
         map<Chatroom*, int> &get_chatrooms();
         void remove_chatroom(Chatroom*);
+        bool checkNumChatrooms();
     private: 
         vector<User*> users;
         map<Chatroom*, int> chatrooms;

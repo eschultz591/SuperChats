@@ -2,8 +2,8 @@ CXXFLAGS = -std=c++11
 
 all: executable
 
-executable: main.o view.o server.o controller.o user.o chatroom.o message.o
-	$(CXX) $(CXXFLAGS) main.o view.o server.o controller.o user.o chatroom.o message.o
+executable: main.o view.o server.o controller.o user.o chatroom.o message.o window.o
+	$(CXX) $(CXXFLAGS) main.o view.o server.o controller.o user.o chatroom.o message.o window.o -lncurses
 	./a.out
 
 main.o: main.cpp controller.h
@@ -26,6 +26,10 @@ chatroom.o: chatroom.cpp chatroom.h user.h message.h
 
 message.o: message.h message.cpp
 	$(CXX) $(CXXFLAGS) -c message.cpp
+
+window.o: window.cpp window.h controller.h
+	$(CXX) $(CXXFLAGS) -c window.cpp
+
 
 clean:
 	rm -rf *.o

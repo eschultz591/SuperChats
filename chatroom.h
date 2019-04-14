@@ -17,7 +17,8 @@ class Chatroom{
         void remove_user(string);
         void add_message(string);
         vector<string> get_messages();
-        
+        bool checkNumUsers();
+        //bool checkChatName(string);
 
     private: 
         string name;

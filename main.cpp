@@ -1,9 +1,15 @@
-#include "controller.h"
+#include "window.h"
 
 int main(){
-    Server server;
+    /*Server server;
     View view(server);
     Controller controller(server, view);
     controller.setup();
-    controller.interface();
+    controller.interface();*/
+
+
+    Window window;
+    window.start();
+    
+
 }

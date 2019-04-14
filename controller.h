@@ -19,6 +19,9 @@ class Controller{
         void auto_add_user_to_lobby(User*);
         void add_message();
         void display_messages();
+        bool check_Username(string);
+        void edit_username();
+        bool checkChatName(string);
 
     private: 
         Server& server;
