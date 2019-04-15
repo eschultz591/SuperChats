@@ -135,7 +135,6 @@ User* Controller::create_user_first_time(string username){
     //string username;
     //view.username_prompt();
     //cin >> username;
-    
     User* user = new User();
     user->setUsername(username);
 

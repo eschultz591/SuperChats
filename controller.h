@@ -17,7 +17,7 @@ class Controller{
         void boot_users_to_lobby(Chatroom*);
         void boot_user_to_lobby();
         void auto_add_user_to_lobby(User*);
-        void add_message();
+        void add_message(); 
         void display_messages();
         int check_Username(string);
         void edit_username();
