@@ -1,0 +1,48 @@
+Forgive me, but I really don't know what question I'm trying to ask.
+
+I am trying to transition a chatroom application I made using the MVC pattern to have a windowed interface. I have a `Server` class that keeps track of user and chatroom information, a `View` class that displays chatroom and user information, and a `Controller` class that calls all the appropriate functionality (add users to chatroom, remove users, etc.) I want my `Window` class to be able to use functions from my `Controller` class, whose constructor is initialized with a `Server` reference and a `View` reference.  I'm using reference objects to ensure that any update to the chatroom or user info is kept on the server. I want only one `Server` object.
+
+Here is my `Controller` constructor and initializer list:
+
+    #include "view.h"
+
+    class Controller{
+        public: 
+            Controller(Server& serv, View& v): server(serv), view(v){};
+    private: 
+        Server& server;
+        View& view;
+    };
+
+The `View` class includes `"server.h"`, and this constructor has worked fine when I've called `server` and `view` functions from the controller class.
+
+Up until this point, my `int main()` looked like this:
+
+    Server server;
+    View view(server);
+    Controller controller(server, view);
+    controller.setup();
+    controller.interface();
+
+And the program ran perfectly fine.  Now I want to add
+
+I tried to follow the same structor I used in the `Controller` constructor, but I'm not getting the `Window` constructor correct.  Here was my attempt: 
+
+    #include "controller.h"
+    #include <ncurses.h>
+
+    class Window{
+
+    public: 
+        Window(Controller& con(Server& serv, View& v)) : controller(con(server(serv), view(v))){};
+        void start();
+        void main_page(string user_input);
+    private: 
+        Controller& controller;
+        Server& server;
+        View& view;
+    };
+
+I've tried several other ways, but none of them have been correct. Where am I going wrong?  I'm wondering if I only need the private variable `Controller& controller` since my `Controller` constructor already has references to a `Server` and `View` object.
+
+ Which leads me to another worry: if I make updates to my server by calling functions on my `Server` object, will I run into memory problems since the `Controller` class has a reference to a `Server` object and now my `Window` class has references to one? I want only one `Server` object, one `Controller` object, and one `Window` object.  How can I ensure this?

@@ -2,7 +2,10 @@
 
 //global main window
 
-
+int main_height= 100;
+int main_width = 300;
+int start_y = 0, start_x = 0;
+    
 
 void Window::start(){
     //cbreak();
@@ -10,9 +13,6 @@ void Window::start(){
     raw();
     //noecho();
 
-    int main_height= 100;
-    int main_width = 300;
-    int start_y = 0, start_x = 0;
     
 
     //for the username window
@@ -86,7 +86,20 @@ void Window::main_page(string username, WINDOW* main){
      wclear(main);
      wrefresh(main);
      box(main,0,0);
-     wrefresh(main); 
+     wrefresh(main);
+
+     int grid_height = main_height/2;
+     int grid_width = main_width/2 - 4;
+
+     WINDOW* chatroom_grid = newwin(grid_height, grid_width, 1, 1);
+     WINDOW* lobby_grid = newwin(grid_height, grid_width, 1, main_width/2 + 2);
+     refresh();
+     box(chatroom_grid, 0, 0);
+     box(lobby_grid, 0, 0);
+     mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS");
+     mvwprintw(lobby_grid, 1, grid_width/2 + grid_width, "LOBBY");
+     wrefresh(chatroom_grid);
+     wrefresh(lobby_grid);
      //test_controller();
      getch();
 }
