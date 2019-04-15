@@ -90,6 +90,8 @@ void Window::start(){
 }
 
 void Window::main_page(string username, WINDOW* main){
+
+    //page set up
     controller.setup(username);
     wclear(main);
     wrefresh(main);
@@ -135,6 +137,7 @@ void Window::main_page(string username, WINDOW* main){
     int highlight = 0;
     int selection;
 
+    //prints list the first time
     for(int i = 0; i < 4; i++){
         
         if(i == 0){
@@ -145,43 +148,32 @@ void Window::main_page(string username, WINDOW* main){
         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
         
     }
+    int i = 0;
     wrefresh(menu_grid);
+    noecho();
+    curs_set(false);
 
-    getch();
+    //27 is the escape key
+    while (c = wgetch(menu_grid) != 27){
+        mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
+        
+            switch( c ) {
+                case KEY_UP:
+                            i--;
+                            i = ( i<0 ) ? 4 : i;
+                            break;
+                case KEY_DOWN:
+                            i++;
+                            i = ( i>4 ) ? 0 : i;
+                            break;
+            }
+            // now highlight the next item in the list.
+            wattron( menu_grid, A_REVERSE );
+            wrefresh(menu_grid);
+            mvwprintw(menu_grid, i+2, 1, choices[i].c_str());
+            wattroff( menu_grid, A_REVERSE );
+            wrefresh(menu_grid);
+    }
+
+    //getch();
 }
-
-
-//demo.c #include <ncurses.h> #include <unistd.h> int main(int argc, char *argv[]) { int parent_x, parent_y; int score_size = 3; initscr(); noecho(); curs_set(FALSE); // get our maximum window dimensions getmaxyx(stdscr, parent_y, parent_x); // set up initial windows WINDOW *field = newwin(parent_y - score_size, parent_x, 0, 0); WINDOW *score = newwin(score_size, parent_x, parent_y - score_size, 0); // draw to our windows mvwprintw(field, 0, 0, "Field"); mvwprintw(score, 0, 0, "Score"); // refresh each window wrefresh(field); wrefresh(score); sleep(5); // clean up delwin(field); delwin(score); endwin(); return 0; }
-
- /*switch (c)
-        {
-            case KEY_DOWN:
-                highlight++;
-                if(highlight > 4){
-                    highlight = 4;
-                }
-                break;
-            case KEY_UP: 
-                highlight--;
-                if(highlight < 0){
-                    highlight = 0;
-                }
-                break;
-            case 27:
-                wclear(menu_grid);
-                wclear(lobby_grid);
-                wclear(chatroom_grid);
-                wclear(main);
-                wrefresh(menu_grid);
-                wrefresh(lobby_grid);
-                wrefresh(chatroom_grid);
-                wrefresh(main);
-                box(main, 0, 0);
-                wrefresh(main);
-                mvwprintw(main, main_height/2, main_width/2 - 13, "Thanks for using Superchat");
-                wrefresh(main);
-                getch();
-                break;
-            default:
-                break;
-        }*/
