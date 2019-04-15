@@ -6,7 +6,7 @@ class Window{
     public: 
         Window(Controller& con, Server& serv, View& v) : controller(con), server(serv), view(v){};
         void start();
-        void main_page(string user_input);
+        void main_page(string user_input, WINDOW*);
         void test_controller();
     private: 
         Controller& controller;

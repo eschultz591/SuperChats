@@ -1,7 +1,7 @@
 #include "controller.h"
 
-void Controller::setup(){
-    User* user = create_user_first_time();
+void Controller::setup(string username){
+    User* user = create_user_first_time(username);
     bool lobby_already_created = false;
 
     for(auto&&x : server.get_chatrooms()){
@@ -96,20 +96,20 @@ void Controller::create_user(){
     auto_add_user_to_lobby(user);
 }
 
-bool Controller::check_Username(string u_n){
+int Controller::check_Username(string u_n){
 	//checking the length
-	if((u_n.length()) > 50){		
-		cout << "Username is to long." << endl;
-		return false;
+	if((u_n.length()) > 5){		
+		//cout << "Username is to long." << endl;
+		return 2;
 	}
 	//checking if user already exist
 	for(auto x: server.get_users()){
 		if(x->getUsername() == u_n){
 			cout << "Username already exist." << endl;
-			return false;
+			return 3;
 		}
 	}
-	return true;
+	return 1;
 }
 
 void Controller::edit_username() {
@@ -131,10 +131,11 @@ void Controller::edit_username() {
 }
 
 
-User* Controller::create_user_first_time(){
-    string username;
-    view.username_prompt();
-    cin >> username;
+User* Controller::create_user_first_time(string username){
+    //string username;
+    //view.username_prompt();
+    //cin >> username;
+    
     User* user = new User();
     user->setUsername(username);
 

@@ -4,10 +4,10 @@ class Controller{
     public: 
         Controller(Server& serv, View& v): server(serv), view(v){};
         void interface();
-        void setup();
+        void setup(string);
         void execute_cmd(int);
         void create_user();
-        User* create_user_first_time();
+        User* create_user_first_time(string);
         void remove_user_from_server();
         void user_to_mod();
         void create_chatroom();
@@ -19,7 +19,7 @@ class Controller{
         void auto_add_user_to_lobby(User*);
         void add_message();
         void display_messages();
-        bool check_Username(string);
+        int check_Username(string);
         void edit_username();
         bool checkChatName(string);
 

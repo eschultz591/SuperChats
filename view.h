@@ -5,7 +5,9 @@ class View{
         View(Server& serv) : server(serv){};
         string get_menu();
         void username_prompt();
-        void view_current_users();
+        string view_current_users();
+        string too_long_prompt();
+        string user_already_exists();
         void no_user_prompt();
         void chatroom_name_prompt();
         void view_chatrooms();

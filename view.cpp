@@ -27,7 +27,7 @@ void View::username_prompt(){
     cout << "Enter a username: ";
 }
 
-void View::view_current_users(){
+string View::view_current_users(){
     string header = R"(
 XXXXXXXXXXXXX
 Current Users
@@ -36,6 +36,7 @@ XXXXXXXXXXXXX
 )";
     header += server.display_users2();
     cout << header;
+    return header;
 }
 
 void View::view_chatrooms(){
@@ -86,4 +87,12 @@ void View::message_prompt(){
 
 void View::maxed_users_prompt(){
     cout << "Maxed users reached. Try again later.\n";
+}
+
+string View::too_long_prompt(){
+    return "Username is too long.";
+}
+
+string View::user_already_exists(){
+    return "Username already taken.";
 }
