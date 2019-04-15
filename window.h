@@ -4,10 +4,12 @@
 class Window{
 
     public: 
-        Window();
+        Window(Controller& con, Server& serv, View& v) : controller(con), server(serv), view(v){};
         void start();
+        void main_page(string user_input);
+        void test_controller();
     private: 
-        Controller* con;
-        Server* server;
-        View* view;
-};
+        Controller& controller;
+        Server& server;
+        View& view;
+}; 

@@ -1,14 +1,14 @@
 #include "window.h"
 
 int main(){
-    /*Server server;
+    Server server;
     View view(server);
     Controller controller(server, view);
-    controller.setup();
-    controller.interface();*/
+    //controller.setup();
+    //controller.interface();*/
 
 
-    Window window;
+    Window window(controller,server,view);
     window.start();
     
 
