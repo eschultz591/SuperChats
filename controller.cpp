@@ -1,7 +1,7 @@
 #include "controller.h"
 
-void Controller::setup(string username){
-    User* user = create_user_first_time(username);
+void Controller::setup(User* user){
+    create_user_first_time(user);
     bool lobby_already_created = false;
 
     for(auto&&x : server.get_chatrooms()){
@@ -12,7 +12,7 @@ void Controller::setup(string username){
     }
 
     if(!lobby_already_created){
-        Chatroom* lobby = create_lobby();
+        create_lobby();
     }
     auto_add_user_to_lobby(user); 
     
@@ -131,12 +131,10 @@ void Controller::edit_username() {
 }
 
 
-User* Controller::create_user_first_time(string username){
+void Controller::create_user_first_time(User* user){
     //string username;
     //view.username_prompt();
     //cin >> username;
-    User* user = new User();
-    user->setUsername(username);
 
     //first user to log into server becomes admin
     int size = server.getUsers().size();
@@ -145,7 +143,6 @@ User* Controller::create_user_first_time(string username){
     }
     
     server.add_user(user);
-    return user;
 }
 
 void Controller::auto_add_user_to_lobby(User* user){
@@ -295,11 +292,10 @@ void Controller::create_chatroom(){
     server.add_chatroom(chatroom);
 }
 
-Chatroom* Controller::create_lobby(){
+void Controller::create_lobby(){
     Chatroom* chatroom = new Chatroom();
     chatroom->set_name("Lobby");
     server.add_chatroom(chatroom);
-    return chatroom;
 }
 
 //Deletes users from chatroom, removes chatroom from server, then deletes chatroom object

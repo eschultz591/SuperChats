@@ -6,16 +6,10 @@ int main_height;
 int main_width;
 
 void Window::start(){
+    User* user = new User();
     //cbreak();
     initscr();
     raw();
-    //noecho();
-
-    /*int main_height= 100;
-    int main_width = 300;
-    int start_y = 0, start_x = 0;
-    
-    */
     getmaxyx(stdscr,main_height,main_width);
     int start_y = 0, start_x = 0;
 
@@ -76,6 +70,8 @@ void Window::start(){
 
     }while(valid_username != 1);
 
+    user->setUsername(username);
+
     wclear(input_window);
     wrefresh(input_window);
     wclear(user_name_window);
@@ -85,14 +81,14 @@ void Window::start(){
     box(main_win, 0, 0);
     wrefresh(main_win);
 
-    main_page(username, main_win);
+    controller.setup(user);
+    main_page(user,main_win);
     endwin();
 }
 
-void Window::main_page(string username, WINDOW* main){
+void Window::main_page(User* user, WINDOW* main){
 
     //page set up
-    controller.setup(username);
     wclear(main);
     wrefresh(main);
     box(main,0,0);
@@ -100,45 +96,50 @@ void Window::main_page(string username, WINDOW* main){
 
     int grid_height = main_height/2;
     int grid_width = main_width/2 - 4;
-    string user_colon = username + ": ";
+    string user_colon = user->getUsername() + ": ";
     string choices[4] = {"Join Chat", "Create Chat", "Delete Chat", "Change Username"};
 
 
     WINDOW* chatroom_grid = newwin(grid_height, grid_width, 1, 1);
     WINDOW* lobby_grid = newwin(grid_height, grid_width, 1, main_width/2 + 2);
     WINDOW* menu_grid = newwin(grid_height/2, grid_width, grid_height + 1, 1);
-    WINDOW* input_box = newwin(grid_height * .2, grid_width - 4, grid_height - grid_height* .2, grid_width + 8);
+    WINDOW* message_box = newwin(grid_height * .2, grid_width - 4, grid_height - grid_height* .2, grid_width + 8);
+    WINDOW* output_box = newwin(grid_height/2, grid_width, grid_height + 1, main_width/2 + 2);
+    WINDOW* input_box = newwin(grid_height * .2, grid_width - 4, grid_height + grid_height/2 + 1, grid_width + 8);
     refresh();
     box(chatroom_grid, 0, 0);
     box(lobby_grid, 0, 0);
     box(menu_grid, 0, 0);
+    box(message_box, 0, 0);
+    box(output_box, 0, 0);
     box(input_box, 0, 0);
     wattron(chatroom_grid, A_BLINK); 
     mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS"); 
     wattroff(chatroom_grid,A_BLINK); 
     mvwprintw(lobby_grid, 1, grid_width/2, "LOBBY");
     mvwprintw(menu_grid, 1, grid_width/2, "MENU");
-    mvwprintw(input_box, (grid_height* .2)/2, 1, user_colon.c_str());
+    mvwprintw(message_box, (grid_height* .2)/2, 1, user_colon.c_str());
 
-    wmove(menu_grid,1,1);
+    //wmove(menu_grid,1,1);
+    //wmove(output_box, 1, 1);
     refresh();
 
-    
+    wrefresh(input_box);
     wrefresh(chatroom_grid);
     wrefresh(lobby_grid);
     wrefresh(menu_grid);
-    wrefresh(input_box);
+    wrefresh(message_box);
+    wrefresh(output_box);
     refresh();
-    wmove(menu_grid,2, 1);
+    /*wmove(menu_grid,2, 1);
     refresh();
     wrefresh(menu_grid);
     keypad(menu_grid, true);
+    */
     int c;
-    int highlight = 0;
-    int selection;
-
+    int i = 0;
     //prints list the first time
-    for(int i = 0; i < 4; i++){
+    for(i = 0; i < 4; i++){
         
         if(i == 0){
             wattron(menu_grid,A_REVERSE);
@@ -148,32 +149,56 @@ void Window::main_page(string username, WINDOW* main){
         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
         
     }
-    int i = 0;
-    wrefresh(menu_grid);
-    noecho();
-    curs_set(false);
+    wrefresh(output_box);
+    mvwprintw(input_box, 1, (grid_width - 4)/ 2 , "in the inputbox");
+    wrefresh(input_box);
+    int a = getch();
 
+    if(a == 'a'){
+        mvwprintw(output_box, 2, 1, "Enter chatroom name");
+        wrefresh(output_box);
+
+        wmove(input_box, 2, 1);
+        wrefresh(input_box);
+        getch();
+    }
+    //wgetch(output_box);
+    i = 0;
+    wrefresh(output_box);
+    wrefresh(menu_grid);
+    //getch();
     //27 is the escape key
-    while (c = wgetch(menu_grid) != 27){
+    /*while (c = wgetch(menu_grid) != 27){
         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
         
             switch( c ) {
                 case KEY_UP:
-                            i--;
-                            i = ( i<0 ) ? 4 : i;
-                            break;
+                    i--;
+                    if(i == -1){
+                        i = 4;
+                    }
+                    break;
                 case KEY_DOWN:
-                            i++;
-                            i = ( i>4 ) ? 0 : i;
-                            break;
+                    i++;
+                    if(i == 5){
+                        i = 0;
+                    }
+                    break;
+                case KEY_RIGHT: 
+                    lobby_chat(input_box);
+                    break;
             }
             // now highlight the next item in the list.
             wattron( menu_grid, A_REVERSE );
-            wrefresh(menu_grid);
             mvwprintw(menu_grid, i+2, 1, choices[i].c_str());
-            wattroff( menu_grid, A_REVERSE );
             wrefresh(menu_grid);
-    }
+            wattroff( menu_grid, A_REVERSE );
+    }*/
+}
 
-    //getch();
+void Window::lobby_chat(WINDOW* input_box){
+    wmove(input_box, 1, 1);
+    refresh();
+    wrefresh(input_box);
+    getch(); 
 }
