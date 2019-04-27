@@ -1,8 +1,16 @@
-#include "controller.h"
+#include "window.h"
 
 int main(){
     Server server;
     View view(server);
     Controller controller(server, view);
-    controller.interface();
+    //controller.setup();
+    //controller.interface();
+
+
+    Window window(controller,server,view);
+    //window.start();
+    window.chatroom_window();
+    
+
 }
