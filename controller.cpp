@@ -42,6 +42,7 @@ void Controller::interface(){
     } while(cmd != 0);
 }
 
+/*
 void Controller::execute_cmd(int cmd){
     switch(cmd){
         case 0:
@@ -83,7 +84,7 @@ void Controller::execute_cmd(int cmd){
             view.invalid_entry();
             break;
     }
-}
+}/*
 
 /*
 void Controller::create_user(){
@@ -416,15 +417,17 @@ void Controller::add_message(){
     t++;
 }
 
-void Controller::display_messages(Chatroom* chatroom){
-    view.display_messages(chatroom);
+// need to write the code for window where we get 
+// chatroom name. We can pass Chatroom* chatroom actually
+// here right? Wasn't sure how to go about that inside the function.
+void Controller::display_messages(string chatroom_name){
 
-    /*string chatroom_name;
+    //string chatroom_name;
     bool chatroom_found = false;
-    view.chatroom_name_prompt();
+    /*view.chatroom_name_prompt();
     cin >> chatroom_name;*/
 
-    /*for(auto&&x : server.get_chatrooms()){
+    for(auto&&x : server.get_chatrooms()){
         if(x.first->get_name() == chatroom_name){
             view.display_messages(x.first); 
             chatroom_found = true;
@@ -433,14 +436,14 @@ void Controller::display_messages(Chatroom* chatroom){
     }
     if(!chatroom_found){
         view.chatroom_not_found_prompt();
-    }*/
+    
 }
 
-bool Controller::checkChatName(string chatroom) {
+bool Controller::checkChatName(string chatroom){
     for (auto x : server.get_chatrooms()) {
-	    if (x.first->get_name() == chatroom)
-	        return true;
-	    else
-	        return false;
-	}
-}  
+	if (x.first->get_name() == chatroom)
+            return true;
+	else
+	    return false;
+    }
+}  }
