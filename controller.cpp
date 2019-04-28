@@ -101,7 +101,7 @@ void Controller::create_user(){
 
 int Controller::check_Username(string u_n){
 	//checking the length
-	if((u_n.length()) > 5){		
+	if((u_n.length()) > 50){		
 		view.too_long_prompt();
 		return 2;
 	}
