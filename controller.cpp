@@ -4,138 +4,141 @@
 void Controller::interface(){
     int cmd = 0;
 
-   // do{
         cout << view.get_menu();
-       // cin >> cmd;
         cout <<"";
-        //execute_cmd(cmd);
 
-  //  } while(cmd != 0);
     test();
 }
-/*
-void Controller::execute_cmd(int cmd){
-    switch(cmd){
-        case 1:
-            create_user();
-            break;
-        case 2:
-            remove_user();
-            break;
-        case 3:
-            user_to_mod();
-            break;
-        case 4:
-            view.view_current_users();
-            break;
-        case 5:
-            create_chatroom();
-            break;
-        case 6:
-            view.view_chatrooms();
-            break;
-        case 7:
-            add_user_to_chatroom();
-            break;
-        case 8:
-            remove_chatroom();
-            break;
-        case 9:
-            //char n[25];
-           // n= getNickname();
-            test();
-            break;
-    }
-}
-*/
-/*
-char* Controller::getNickname(char name[25])
-{
-    char* nick[];
-     cout << "Welcome to SuperChat!\n\nPlease enter a nick to begin: ";
-    //cin.getline (nick, 25);
-    cin.getline (nick,25);
-    return nick;
 
-}*/
 int Controller::test()
 {
-   // cout << "HERHEHREHREHHERHREH";
+		cout <<"the now ide is working";
 
-   // int Run(/*int argc, char* argv[]*/)
-//{
-  /*try
-  {
-    if (argc != 3)
-    {
-      std::cerr << "Usage: chat_client <host> <port>\n";
-      return 1;
-    }*/
     char l;
 	char chat_name[24];
 	char target[25];
     char time_buffer[32];
     time_t t_;
+    bool joined = false;
     strftime(time_buffer, 32, "%c", localtime(&t_));
     char nick[24];
     string temp1;
     int chatroomNumber = 0;
-    char head[4] ="123";
+    char head[50] ="000";
     cout << "Welcome to SuperChat!\n\nPlease enter a nick to begin: \n";
     cin >> nick;
-    //cin.getline (nick, 25);
 
     io_context io_context;
 
-    //tcp::resolver resolver(io_context);
-   // auto endpoints = resolver.resolve(argv[1], argv[2]);
-    /*TEST TCP VERSION*/
+
     tcp::resolver resolver(io_context);
     tcp::resolver::results_type endpoints = resolver.resolve("127.0.0.1", "1234");
 
     chat_client c(io_context, endpoints);
+    reset_header(c);
     strcpy(c.name,nick);
-    //memcpy(c.headT, nick, 30);
-    //strcat(c.headT, nick);
+    c.headT[0] = c.currCR;
+    c.headT[1] = '0';
+    c.headT[2] = c.ucount1;
+    c.headT[3] = c.ucount2;
+    strcat(c.headT, c.name);
+
+    //strcat(c.headT, nick );
+    //strcat(head, nick);
+
+
+    string name;
+
     std::thread t([&io_context](){ io_context.run(); });
     char formatted_message[chat_message::max_body_length + chat_message::header_length + 1];
-    // create a date and time string, copy into formatted_message, concatenate nick, then concatenate msg
+
     char line[chat_message::max_body_length +chat_message::header_length + 1];
     std::cout << "Welcome to the main lobby! \n\n" << std::endl;
+     update_server(c);
+
+
+
+    //join(c);
+   // strcpy(c.headT,"");
+
+     c.headT[1] = 'L';
+
     while (std::cin.getline(line, chat_message::max_body_length + 1))
     {
+                     update_server(c);
 
 
+                //strcpy(c.name, "");
+
+
+/* if (joined == false)
+        {  c.headT[1] ='C';
+        //strcat(c.headT, c.name );
+            joined = true;
+        }*/
+
+
+        /*if(c.headT[1] == 'C')
+        {
+
+      chat_message msg2;
+      msg2.body_length(std::strlen(formatted_message));
+      std::memcpy(msg2.body(), formatted_message, msg2.body_length());
+
+    msg2.set_header(c.headT);
+    msg2.encode_header();
+        //cout << c.headT << "";
+
+      c.write(msg2);
+        cout << msg2.data();
+
+       strcpy(c.headT,"");
+      temp1 ="";
+        c.headT[0] = c.currCR;
+
+                c.headT[1] = '0';
+                c.headT[2] = c.currCR;
+                c.headT[3] = c.isMod;
+
+
+
+        }*/
       if (line[0] == '#')
       {
         switch (line[1])
         {
 
             case '1':
-                //strcpy(head, "123");
-                //c.currCR ='2';
-                strcpy(head,"223");
-                c.headT[0] ='2';
-            //create_user();
+            reset_header(c);
+            attempt_ban(c, nick);
             break;
         case '2':
-            c.currCR ='1';
-            c.headT[0] = '1';
-            //remove_user();
+            attempt_delete(c);
             break;
         case '3':
-            user_to_mod();
+           c.headT[1] ='C';
+            strcat(c.headT, nick );
+            //user_to_mod();
             break;
         case '4':
             view.view_current_users();
             break;
         case '5':
-            //char temp[24];
-           temp1 = create_chatroom();
+            name;
+
+        reset_header(c);
+
+
+        view.chatroom_name_prompt();
+        cin >> name;
+           temp1 = name; //= create_chatroom();
+           //c.headT[3 + sizeof(nick)]
 
            strcat(c.headT, temp1.c_str() );
+            strcat(c.headT, " ");
+            strcat (c.headT, nick);
            c.headT[1] = 'S';
-
+            temp1 = "";
             break;
         case '6':
             view.view_chatrooms();
@@ -144,24 +147,30 @@ int Controller::test()
             add_user_to_chatroom();
             break;
         case '8':
-            //cout << "HERE" <<c.ChatRooms[0].s;
-            remove_chatroom();
+            join_chatroom(c);
+            //remove_chatroom();
             break;
 
 
         case '9':
-    /*    view.chatroom_name_prompt();
-    cin >> chat_name;
-            c.ChangeCR(chat_name);*/
-             /*l = join_chatroom(c);
-            c.currCR = l;
-            cout << "L EQUALS" << l << "   ===";
-            c.headT[1] = l;*/
-             char chatroom_name[24];
 
+            cout << c.users.size();
+            update_server(c);
+
+
+        for(auto x : c.ChatRooms)
+       {
+            std::cout << "user created!"<<x.s <<"mod: "<<x.modN<<"\n";
+
+        }
+
+
+
+            /* char chatroom_name[24];
     view.chatroom_name_prompt();
     cin >> chatroom_name;
             c.ChangeCR(chatroom_name);
+            c.isMod = 'A';*/
             break;
 
         }
@@ -176,42 +185,41 @@ int Controller::test()
       chat_message msg;
       msg.body_length(std::strlen(formatted_message));
       std::memcpy(msg.body(), formatted_message, msg.body_length());
-     // std::memcpy(msg.header, head, msg.header_length);
-      //strcpy(head, "123");
-        //c.header_set(head);
-        //strcpy(head, "789");
-        //strcpy(msg.header, "789");
+    //strcat(c.headT, c.name );
     msg.set_header(c.headT);
     msg.encode_header();
-    //std::cout << "/n";
-   // std::cout.write(msg.data(),msg.header_length);
-  //  std::cout << "/n";
+        //cout << c.headT << "";
+
       c.write(msg);
-strcpy(c.name,"");
-            strcpy(c.headT,"");
+
+     strcpy(c.headT,"");
+                temp1 ="";
+                name = "";
+
+             reset_header(c);
+                         strcat (c.headT, nick);
+
+                      //reset_header(c);
+
+        //update_server(c);
+
+
+
+
+       /* strcpy(c.headT,"");
       temp1 ="";
         c.headT[0] = c.currCR;
-                c.headT[1] = c.currCR;
+                c.headT[1] = '0';
                 c.headT[2] = c.currCR;
-                c.headT[3] = c.currCR;
-
-      //update formatted_message with date and time
-      //c.headT[1] = c.currCR;
+                c.headT[3] = c.isMod;
+*/
+         update_server(c);
 
     }
 
     c.close();
     t.join();
-   // return 0;
-  //}
- /* catch (std::exception& e)
-  {
-    std::cerr << "Exception: " << e.what() << "\n";
-  }
 
-  return 0;
-}
-*/
     return 0;
 }
 
@@ -323,7 +331,6 @@ string Controller::create_chatroom(){
 }
 
 
-//Deletes users from chatroom, removes chatroom from server, then deletes chatroom object
 void Controller::remove_chatroom(){
     string chatroom_name;
     int position = 0;
@@ -348,8 +355,56 @@ void Controller::remove_chatroom(){
 
 
 
-char Controller::join_chatroom(chat_client & c){
-    int y = 0;
+void Controller::join_chatroom(chat_client & c){
+
+
+
+    stringstream ts;
+    string str;
+    char cr;
+    string chatroom_name;
+    int position = 0;
+    bool foundChat = false;
+    view.chatroom_name_prompt();
+    cin >> chatroom_name;
+    int b = 0;
+    int cur_cr;
+
+
+     for(auto&& x : server.get_chatrooms()){
+            if(x.first->get_name() == chatroom_name){
+
+
+               /* stringstream strValue;
+                strValue << c.currCR;
+
+
+                strValue >> cur_cr;
+
+                //cur_cr = int(c.currCR);
+                  cout <<"curcr = " << cur_cr;
+                c.ChatRooms[cur_cr].user_count--;*/
+
+                //x.first->add_user(user);
+
+                c.headT[2] = c.currCR;
+                c.headT[1] ='1';
+                server.get_chatrooms().at(x.first) += 1;
+                cr = '0' + b;
+                c.currCR = cr;
+                 c.headT[3] = cr;
+                foundChat = true;
+                //c.ChatRooms[b].user_count++;
+                  std::cout<< "mod :" <<c.ChatRooms[b].modN <<"]";
+                return;
+    }b++;}
+
+
+    cout<< "no chatroom with that name :(";
+    return;
+
+
+    /*int y = 0;
     stringstream ts;
     std::string str;
  string chatroom_name;
@@ -361,24 +416,137 @@ char Controller::join_chatroom(chat_client & c){
     for(auto x : server.get_chatrooms()){
         if (x.first->get_name() == chatroom_name){
             foundChat = true;
-            //ts << y;
-            //str = ts.str();
-          //  const char* cs = str.c_str();
-            //strcpy(c->headT, str.c_str());
-            //c->currCR = (char)y;
-            //strcpy(c->currCR ,str.c_str());
-            //char z = itoa(y);
+
             char z = '0' + y;
                c.currCR = z;
-            cout << "L EQUALS" << z << "   ===";
+            cout << "L EQUALS" << z << "===";
             c.headT[1] = z;
-           //return z;
             }
 
  if(!foundChat){
         cout << "Chatroom not found.\n" << endl;
     }
 y++;
+}*/
 }
+
+
+
+void Controller::update_server(chat_client & c)
+{
+        if(c.ChatRooms.size() ==0)
+        {return;}
+      int z;
+      int y;
+      int b;
+    if (c.ChatRooms.size() > server.get_num_cr())
+    {
+        z = c.ChatRooms.size() - server.get_num_cr();
+
+
+        y = server.get_num_cr();
+
+        for (y ; y < c.ChatRooms.size(); y++)
+        {
+            char name[24];
+            strcpy(name, c.ChatRooms[y].s);
+            Chatroom* chatroom = new Chatroom();
+            chatroom->set_name(name);
+            server.add_chatroom(chatroom);
+        }
+
+
+
+    }
+  if (c.users.size() > server.get_num_usr())
+    {
+        y = server.get_num_usr();
+
+          for (y ; y < c.users.size(); y++)
+        {
+            char name[24];
+            strcpy(name, c.users[y].s);
+            User* user = new User();
+            user->setUsername(name);
+            server.add_user(user);
+        }
+
+    }
+
+
+
+
 }
+
+void Controller::reset_header(chat_client & c)
+{
+    for(int b = 0; b <= 50; b++)
+                {
+                    c.headT[b] ='\0';
+                }
+                c.headT[0] = c.currCR;
+                c.headT[1] = '0';
+                c.ucount1 = '0';
+                c.ucount2 = '0';
+                c.headT[2] = c.ucount1;
+                c.headT[3] = c.ucount2;
+                strcat(c.headT,c.name);
+        return;
+
+}
+
+void Controller::attempt_ban(chat_client & c,char nick[24])
+{
+        string bannie;
+    view.username_prompt();
+        cin >> bannie;
+           strcat(c.headT, nick);
+           strcat(c.headT, " ");
+           strcat(c.headT, bannie.c_str());
+
+           c.headT[1] = 'B';
+
+}
+
+void Controller::attempt_delete(chat_client & c)
+{
+    string name;
+    view.chatroom_name_prompt();
+    cin >> name;
+    strcat(c.headT, " ");
+    strcat(c.headT, name.c_str());
+    strcat(c.headT, " ");
+
+    c.headT[1] = 'D';
+}
+/*
+void Controller::join(chat_client & c)
+{
+      char formatted_message[48+8+512 + 1];
+
+      chat_message msg2;
+
+      msg2.body_length(std::strlen(formatted_message));
+      std::memcpy(msg2.body(), formatted_message, msg2.body_length());
+
+    msg2.set_header(c.headT);
+    msg2.encode_header();
+        //cout << c.headT << "";
+
+      c.write(msg2);
+
+
+
+    strcpy(c.headT,"");
+
+        c.headT[0] = c.currCR;
+                 c.headT[1] = '0';
+                 c.headT[2] = c.currCR;
+                 c.headT[3] = c.isMod;
+
+
+
+}
+*/
+
 

@@ -5,7 +5,7 @@
 #include <map>
 
 class Server{
-    public: 
+    public:
         vector<User*> getUsers();
         void add_user(User*);
         string display_users();
@@ -16,8 +16,13 @@ class Server{
         string display_chatrooms();
         map<Chatroom*, int> &get_chatrooms();
         void remove_chatroom(Chatroom*);
-    private: 
+
+        int get_num_usr();
+        int get_num_cr();
+
+
+    private:
         vector<User*> users;
-        map<Chatroom*, int> chatrooms; 
+        map<Chatroom*, int> chatrooms;
 
 };

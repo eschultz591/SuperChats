@@ -132,8 +132,10 @@ private:
         {
           if (!ec)
           {
+
             room_.deliver(read_msg_);
             do_read_header();
+
           }
           else
           {

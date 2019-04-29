@@ -17,7 +17,14 @@ class Controller{
         void add_user_to_chatroom();
         void remove_chatroom();
 
-        char join_chatroom(chat_client& c);
+        void attempt_delete(chat_client & c);
+        void reset_header(chat_client & c);
+
+        void attempt_ban(chat_client & c, char nick[24]);
+
+        void update_server(chat_client & c);
+        void join(chat_client & c);
+        void join_chatroom(chat_client& c);
         int test();
        //char* getNickname();
     private:
