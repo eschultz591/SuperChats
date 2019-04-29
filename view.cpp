@@ -14,6 +14,7 @@ SUPER CHAT
 6) View Chatrooms
 7) Add user to chat
 8) Remove Chatroom
+9) TEST
 
 )";
 
