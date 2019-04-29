@@ -1,9 +1,7 @@
 #include "window.h"
 
+
 //global main window
-
-
-
 void Window::start(){
     //cbreak();
     initscr();
@@ -123,6 +121,7 @@ void Window::chatroom_window(/*string lobby_name, string username, WINDOW* chat_
 	//setting up what will be in sendMessageBox
 	string userMessageName = username + ": ";
 	char text[80];
+	string textString;
 
 
 	//window for sending messsages in lobby	
@@ -130,9 +129,9 @@ void Window::chatroom_window(/*string lobby_name, string username, WINDOW* chat_
 	WINDOW* messageBox = newwin((yMax/17)*16, (xMax/3)*2, 1, 2);
 	WINDOW* currentUserBox = newwin((yMax/17)*15, (xMax/7)*2, 1, xMax-31);
 	WINDOW* menuBox = newwin((yMax/10)*1.7, (xMax/7)*2, yMax-9, xMax-31);
+	WINDOW* banUserBox = newwin(yMax/10*1.7, (xMax/7)*2, yMax-9, xMax-31);
 
-	
-	//box(sendMessageBox, 0, 0);
+	box(sendMessageBox, 0, 0);	
 	box(messageBox, 0, 0);
 	box(currentUserBox, 0, 0);
 	box(menuBox, 0, 0);
@@ -146,67 +145,100 @@ void Window::chatroom_window(/*string lobby_name, string username, WINDOW* chat_
 	mvwprintw(menuBox, 3, 1, "1 - Ban User");
 	mvwprintw(menuBox, 4, 1, "0 - Exit Chatroom");
 	mvwprintw(menuBox, 5, 1, "[TAB] - Message/Menu Mode");	
+	mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
 	
 	// settiing up the windows for display
-	//wrefresh(sendMessageBox);
+	wrefresh(sendMessageBox);
 	wrefresh(messageBox);
 	wrefresh(currentUserBox);
 	wrefresh(menuBox);	
 
-	int i = 1, menuMode = 1, chatMode = 0, modeSwitch;
+	int i = 2, menuMode = 0, chatMode = 1, modeSwitch;
 	do{
+		mvwprintw(currentUserBox, 2, 1, username.c_str());
+		wrefresh(currentUserBox);
 		curs_set(false);
-		while(chatMode || menuMode){
-			box(sendMessageBox, 0, 0);
-			mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
-			wmove(sendMessageBox, userMessageName.size(), 2);	
-			//wgetstr(sendMessageBox, text);
-			//wclear(sendMessageBox);
-			box(sendMessageBox, 0, 0);
-			wrefresh(sendMessageBox); //refresh to view blank screen
-			
-	
+		while(chatMode){
+			//curs_set(false);
+			noecho();
 			modeSwitch = wgetch(menuBox);
+			while(modeSwitch != 9){
+
+				echo();
+				box(sendMessageBox, 0, 0);
+				mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+				wmove(sendMessageBox, userMessageName.size(), 2);
+				curs_set(true);	
+				wgetstr(sendMessageBox, text);
+				textString = text;
+				modeSwitch = textString.front();
+				wclear(sendMessageBox);
+				box(sendMessageBox, 0, 0);
+				wrefresh(sendMessageBox); //refresh to view blank screen
+				if(textString.front() != 9){
+					mvwprintw(messageBox, i, 1, userMessageName.c_str());
+					mvwprintw(messageBox, i, userMessageName.size()+1, text); //print what is being written in the messages window
+					wmove(messageBox, i++, 1);}
+				wrefresh(messageBox);
+			}
 			if(modeSwitch == 9){
 				chatMode = 0;
 				menuMode = 1;
 				werase(sendMessageBox);
+				wrefresh(sendMessageBox);
+				
+			}
+			if(modeSwitch == 27){
+				chatMode = 0;
+				menuMode = 0;
+			}
+		}
+		while(menuMode){
+			curs_set(false);
+			noecho();
+			getmaxyx(menuBox, yMax, xMax);
+			mvwprintw(menuBox, 1, (xMax/2)-(menuString.size()/2), menuString.c_str());
+			mvwprintw(menuBox, 3, 1, "1 - Ban User");
+			mvwprintw(menuBox, 4, 1, "0 - Exit Chatroom");
+		       	mvwprintw(menuBox, 5, 1, "[TAB] - Message/Menu Mode");	
+			box(menuBox, 0, 0);
+			wrefresh(menuBox);
+			modeSwitch = wgetch(menuBox);
+			//when tab is pressed
+			if(modeSwitch == 9){
+				chatMode = 1;
+				menuMode = 0;
+				werase(menuBox);
+				wrefresh(menuBox);
+				box(sendMessageBox, 0, 0);
+				mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+				wmove(sendMessageBox, userMessageName.size(), 2);
 				wrefresh(sendMessageBox);
 			}
 			if(modeSwitch == 27){
 				chatMode = 0;
 				menuMode = 0;
 			}
-			//wgetstr(sendMessageBox, text);
-			while(menuMode){
-				getmaxyx(menuBox, yMax, xMax);
-				mvwprintw(menuBox, 1, (xMax/2)-(menuString.size()/2), menuString.c_str());
-				mvwprintw(menuBox, 3, 1, "1 - Ban User");
-				mvwprintw(menuBox, 4, 1, "0 - Exit Chatroom");
-			       	mvwprintw(menuBox, 5, 1, "[TAB] - Message/Menu Mode");	
-				box(menuBox, 0, 0);
+			//ban user
+			if(modeSwitch == 49){
+				werase(menuBox);
+				box(banUserBox, 0, 0);
 				wrefresh(menuBox);
-
-				modeSwitch = wgetch(menuBox);
-				if(modeSwitch == 9){
-					chatMode = 1;
-					menuMode = 0;
-					werase(menuBox);
-					wrefresh(menuBox);
-				}
-				if(modeSwitch == 27){
-					chatMode = 0;
-					menuMode = 0;
-				}
+				wrefresh(banUserBox);
 
 			}
-
-			
+			if(modeSwitch == 48){
+				//exit chatroom
+			}
 		}
+		
 
-		/*
+		//This is working properly
+		//Just trying to fix other things
 
-		mvwprintw(currentUserBox, 2, 1, username.c_str());
+		
+
+		/*mvwprintw(currentUserBox, 2, 1, username.c_str());
 		wrefresh(currentUserBox);
 		mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
 		wmove(sendMessageBox, userMessageName.size(), 2);	
@@ -219,6 +251,7 @@ void Window::chatroom_window(/*string lobby_name, string username, WINDOW* chat_
 		wmove(messageBox, i++, 1);
 		wrefresh(messageBox);
 		*/
+		
 	}while(true);
 
 	getch();
