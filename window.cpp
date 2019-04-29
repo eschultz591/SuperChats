@@ -1,12 +1,12 @@
 #include "window.h"
-
+#include <string>
+#include <cstring>
 //global main window
 
 int main_height;
 int main_width;
 
 void Window::start(){
-    User* user = new User();
     //cbreak();
     initscr();
     raw();
@@ -77,8 +77,6 @@ void Window::start(){
 
     }while(valid_username != 1);
 
-    user->setUsername(username);
-
     wclear(input_window);
     wrefresh(input_window);
     wclear(user_name_window);
@@ -88,29 +86,34 @@ void Window::start(){
     box(main_win, 0, 0);
     wrefresh(main_win);
 
-
-    controller.setup(user);
-    main_page(user, main_win);
+    main_page(username, main_win);
     endwin();
 }
 
-void Window::main_page(User* user, WINDOW* main){
+void Window::main_page(string username, WINDOW* main){
 
     //page set up
+    controller.setup(username);
     wclear(main);
     wrefresh(main);
     box(main,0,0);
     wrefresh(main);
+    map<Chatroom*, int> Rooms;
+    Rooms = server.get_chatrooms();
+    //controller.create_chatroom();
 
     int grid_height = main_height/2;
     int grid_width = main_width/2 - 4;
-    string user_colon = user->getUsername() + ": ";
+    char message[80], display[80], space[80] = {0};
+    vector <string> message_list;
+    string helper;
+    string user_colon = username + ": ";
     string choices[4] = {"1 - Join Chat", "2 - Create Chat", "3 - Delete Chat", "4 - Change Username"};
 
     WINDOW* chatroom_grid = newwin(grid_height, grid_width, 1, 1);
     WINDOW* lobby_grid = newwin(grid_height, grid_width, 1, main_width/2 + 2);
     WINDOW* menu_grid = newwin(grid_height/2+1, grid_width, grid_height + 1, 1);
-    WINDOW* input_box = newwin(grid_height * .2, grid_width - 4, grid_height - grid_height* .2, grid_width + 8);
+    WINDOW* input_box = newwin(grid_height * .2+1, grid_width - 4, grid_height - grid_height* .2, grid_width + 8);
     refresh();
     //wrefresh(main);
     box(chatroom_grid, 0, 0);
@@ -141,7 +144,7 @@ void Window::main_page(User* user, WINDOW* main){
     int c;
     int highlight = 0;
     int selection;
-    int menu_mode = 1, chatroom_mode = 0, temp, esc_pressed = 0;
+    int menu_mode = 0, lobby_mode = 1, temp, esc_pressed = 0;
 
     //prints list the first time
 /*    for(int i = 0; i < 4; i++){
@@ -156,31 +159,65 @@ void Window::main_page(User* user, WINDOW* main){
     }*/
     int i = 0;
     wrefresh(menu_grid);
+    ostringstream output;
     noecho();
-    curs_set(false);
     //27 is the escape key 
     //While either chatroom mode or menu mode && esc key is not pressed
-    while (chatroom_mode || menu_mode)
+    while (lobby_mode || menu_mode)
     {
         int menu_printed = 0;
 
-        while (chatroom_mode){
-            c = wgetch(menu_grid);
+        while (lobby_mode){
+            Rooms = server.get_chatrooms();
+            for (auto x: Rooms){
+                helper = (*(x.first)).get_name();
+                strcpy(display, helper.c_str());
+                //display = output.str();
+                mvwprintw(chatroom_grid, i + 2, 1, display);
+
+            }
+            wrefresh(chatroom_grid);
+            wmove(input_box, 1, username.size()+2);
+            c = wgetch(input_box);
+            echo();
+            curs_set(2);
             //if tab is pressed
             if(c == 9 ){
                 //temp = menu_mode; 
                 menu_mode = 1;
-                chatroom_mode = 0;
-                
+                lobby_mode = 0;
             }
             //if escape is pressed             
             if(c == 27 ){
                 //turns off menu and chatroom mode, exiting the window
-                chatroom_mode = 0;
+                lobby_mode = 0;
                 menu_mode = 0;
             }
+            if(c == 32){
+                wgetstr(input_box, message);
+                //printw(message);
+                //(*(Rooms.at(0))).add_message(message);
+                //message_list = (*(Rooms.at(0))).get_messages();
+                if(message_list.size() >= 10)
+                    i = message_list.size() - 10;
+                else
+                    i = 0;
+                for(i; i < message_list.size(); i++){
+                    wattroff(menu_grid,A_REVERSE);
+                    //mvwprintw(lobby_grid, i + 2, 1, message_list.at(i));
+                } 
+
+                mvwprintw(input_box, 1, username.size()+2,space);
+                wrefresh(input_box);
+            } 
+
+
+                wrefresh(input_box);
+                wrefresh(lobby_grid);
+                noecho();
         }
         while (menu_mode){
+                noecho();
                 if(!menu_printed)
                 {
                     mvwprintw(menu_grid, 1, grid_width/2, "MENU");
@@ -188,6 +225,7 @@ void Window::main_page(User* user, WINDOW* main){
                     for(int i = 0; i < 4; i++){
                             wattroff(menu_grid,A_REVERSE);
                         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
+                        } 
                    
                     }
                     int i = 0;
@@ -195,21 +233,30 @@ void Window::main_page(User* user, WINDOW* main){
                      menu_printed = 1;   
 
                     
+                
+                Rooms = server.get_chatrooms();
+                for (auto x: Rooms){
+                    helper = (*(x.first)).get_name();
+                    strcpy(display, helper.c_str());
+                    mvwprintw(chatroom_grid, i + 2, 1, display);
+
                 }
+                wrefresh(chatroom_grid);
+                curs_set(false);
                 c = wgetch(menu_grid);
                 //if tab is pressed
                 if(c == 9){
                     //Turn off menu_mode and cha
                     //temp = menu_mode;
                     menu_mode = 0;
-                    chatroom_mode = 1;
+                    lobby_mode = 1;
                     werase(menu_grid);
                     wrefresh(menu_grid);
                 } 
                 //if escape is pressed
                 if(c == 27 ){
                     //turns off menu and chatroom mode, exiting the window
-                    chatroom_mode = 0;
+                    lobby_mode = 0;
                     menu_mode = 0;
                 }
                 //1 - Join Chatroom
