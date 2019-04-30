@@ -358,7 +358,7 @@ void Controller::boot_users_to_lobby(Chatroom* chatroom){
 
 // need to write the code for window where we get 
 // the name of the user who will be booted from what chatroom
-void Controller::boot_user_to_lobby(string user_remove, string chatroom){
+void Controller::boot_user_to_lobby(string user, string chatroom){
     /*string chatroom, user;
     view.chatroom_name_prompt();
     cin >> chatroom;
