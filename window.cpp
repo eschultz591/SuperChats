@@ -7,6 +7,7 @@ int main_height;
 int main_width;
 
 void Window::start(){
+    User * user = new User();
     //cbreak();
     initscr();
     raw();
@@ -86,14 +87,14 @@ void Window::start(){
     box(main_win, 0, 0);
     wrefresh(main_win);
 
-    main_page(username, main_win);
+    controller.setup(user);
+    main_page(user, main_win);
     endwin();
 }
 
-void Window::main_page(string username, WINDOW* main){
+void Window::main_page(User* user, WINDOW* main){
 
     //page set up
-    controller.setup(username);
     wclear(main);
     wrefresh(main);
     box(main,0,0);
@@ -107,7 +108,7 @@ void Window::main_page(string username, WINDOW* main){
     char message[80], display[80], space[80] = {0};
     vector <string> message_list;
     string helper;
-    string user_colon = username + ": ";
+    string user_colon = user->getUsername() + ": ";
     string choices[4] = {"1 - Join Chat", "2 - Create Chat", "3 - Delete Chat", "4 - Change Username"};
 
     WINDOW* chatroom_grid = newwin(grid_height, grid_width, 1, 1);
@@ -177,7 +178,7 @@ void Window::main_page(string username, WINDOW* main){
 
             }
             wrefresh(chatroom_grid);
-            wmove(input_box, 1, username.size()+2);
+            wmove(input_box, 1, user->getUsername().size()+2);
             c = wgetch(input_box);
             echo();
             curs_set(2);
@@ -207,7 +208,7 @@ void Window::main_page(string username, WINDOW* main){
                     //mvwprintw(lobby_grid, i + 2, 1, message_list.at(i));
                 } 
 
-                mvwprintw(input_box, 1, username.size()+2,space);
+                mvwprintw(input_box, 1, user->getUsername().size()+2,space);
                 wrefresh(input_box);
             } 
 
