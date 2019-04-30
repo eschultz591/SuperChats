@@ -18,6 +18,7 @@ void Controller::setup(User* user){
     
 }
 
+/*
 void Controller::interface(){
     int cmd = 0;
  
@@ -40,7 +41,7 @@ void Controller::interface(){
         execute_cmd(cmd);
 
     } while(cmd != 0);
-}
+}*/
 
 /*
 void Controller::execute_cmd(int cmd){
@@ -101,14 +102,14 @@ void Controller::create_user(){
 
 int Controller::check_Username(string u_n){
 	//checking the length
-	if((u_n.length()) > 50){		
-		view.too_long_prompt();
+	if((u_n.length()) > 15){		
+		//view.too_long_prompt();
 		return 2;
 	}
 	//checking if user already exist
 	for(auto x: server.get_users()){
 		if(x->getUsername() == u_n){
-			view.user_already_exists();
+			//view.user_already_exists();
 			return 3;
 		}
 	}
@@ -357,39 +358,47 @@ void Controller::boot_users_to_lobby(Chatroom* chatroom){
 
 // need to write the code for window where we get 
 // the name of the user who will be booted from what chatroom
-void Controller::boot_user_to_lobby(string user, string chatroom){
+void Controller::boot_user_to_lobby(string user_remove, string chatroom){
     /*string chatroom, user;
     view.chatroom_name_prompt();
     cin >> chatroom;
     view.username_prompt();
     cin >> user;*/
-    bool chatroom_found = false;
-    bool user_found = false;
-    for(auto&&x : server.get_chatrooms()){
-        if (x.first->get_name() == chatroom){
-            
-            //this loop removes user from his current chatroom
-            for(auto&&y : x.first->get_current_users()){
-                if(y->getUsername() == user){
-                    x.first->remove_user(user);
-                    x.second--;
-                    auto_add_user_to_lobby(y);
-                    user_found = true;
-                    break;
-                }
-            }
-            chatroom_found = true;
-            break;
-        }
-    }
 
-    if(!user_found){
-        view.no_user_prompt();
-    }
-    if(!chatroom_found){
-        view.chatroom_not_found_prompt();
+    if (isMod == true) {
+
+        bool chatroom_found = false;
+        bool user_found = false;
+        for(auto&&x : server.get_chatrooms()){
+            if (x.first->get_name() == chatroom){
+            
+                //this loop removes user from his current chatroom
+                for(auto&&y : x.first->get_current_users()){
+                    if(y->getUsername() == user){
+                        x.first->remove_user(user);
+                        x.second--;
+                        auto_add_user_to_lobby(y);
+                        user_found = true;
+                        break;
+                    }
+                }
+                chatroom_found = true;
+                break;
+            }
+        }
+
+        if(!user_found){
+            view.no_user_prompt();
+        }
+        if(!chatroom_found){
+            view.chatroom_not_found_prompt();
+        }
+    } 
+    else {
+	view.no_privileges_prompt();
     }
 }
+
 
 void Controller::add_message(){
     string text;
@@ -436,7 +445,7 @@ void Controller::display_messages(string chatroom_name){
     }
     if(!chatroom_found){
         view.chatroom_not_found_prompt();
-    
+    }
 }
 
 bool Controller::checkChatName(string chatroom){
@@ -446,4 +455,4 @@ bool Controller::checkChatName(string chatroom){
 	else
 	    return false;
     }
-}  }
+}  
