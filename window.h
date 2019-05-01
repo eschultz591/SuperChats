@@ -6,9 +6,9 @@ class Window{
     public: 
         Window(Controller& con, Server& serv, View& v) : controller(con), server(serv), view(v){};
         void start();
-        void main_page(string user_input, WINDOW*);
-	void chatroom_window(/*string lobby_name, string username, WINDOW* main_window*/);
-        void test_controller();
+        void main_page(User*, WINDOW*);
+        void chatroom_window(User*, WINDOW*); 
+
     private: 
         Controller& controller;
         Server& server;
