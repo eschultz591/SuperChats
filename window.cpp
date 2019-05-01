@@ -104,7 +104,7 @@ void Window::main_page(User* user, WINDOW* main){
 
     int grid_height = main_height/2;
     int grid_width = main_width/2 - 4;
-    char message[80], display[80], space[80] = {0};
+    char message[80], display[80], space[45] = {0}, new_username[80];
     vector <string> message_list;
     string helper;
     string user_colon = user->getUsername() + ": ";
@@ -366,6 +366,49 @@ void Window::main_page(User* user, WINDOW* main){
                             wrefresh(chatroom_grid);
                         }
                     }while(valid != 1);
+                }
+                else if (c == 52)
+                {
+
+                    int valid_username;
+                    do{
+                        wclrtoeol(menu_grid);
+                        wrefresh(menu_grid);
+                        wclear(menu_grid);
+                        box(menu_grid, 0, 0);
+                        mvwprintw(menu_grid, 1, grid_width/2-5, "ENTER USERNAME");
+/*                        for(int i = 0; i < 5; i++){
+                            wattroff(menu_grid,A_REVERSE);
+                            mvwprintw(menu_grid, i + 2, 1, "                                              ");
+                        } */
+                        echo();
+                        mvwprintw(menu_grid,2,1,"New Username:");
+                        wmove(menu_grid, 2, 15);
+                        wgetstr(menu_grid, new_username);
+                        valid_username = controller.check_Username(new_username);
+
+                        if(valid_username == 2){
+                            mvwprintw(menu_grid, 5, 1, view.too_long_prompt().c_str());
+                            wrefresh(menu_grid);
+                        }
+                        if(valid_username == 3){
+                            mvwprintw(menu_grid,5,1,view.user_already_exists().c_str());
+                            wrefresh(menu_grid);
+                        }
+
+                    }while(valid_username != 1);
+                    noecho();
+                    user->setUsername(new_username);
+                    werase(menu_grid);
+                    wrefresh(menu_grid);
+                    //Ensures menu prints again
+                    menu_printed = 0;
+                    //Resets name in Lobby (Names in chatroom should change everytime a chatroom is joined)
+                    user_colon = user->getUsername() + ": ";
+                    mvwprintw(input_box, (grid_height* .2)/2, 1, user_colon.c_str());
+                    wrefresh(input_box);
+
+
                 }
         }
 
