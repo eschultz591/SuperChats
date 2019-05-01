@@ -23,76 +23,78 @@ SUPER CHAT
 return menu;
 }
 
-void View::username_prompt(){
-    cout << "Enter a username: ";
+string View::username_prompt(){ 
+    return "Enter a username: ";
 }
 
 string View::view_current_users(){
-    string header = R"(
-XXXXXXXXXXXXX
-Current Users
-XXXXXXXXXXXXX
-
-)";
+    string header = "  ";
     header += server.display_users2();
     cout << header;
     return header;
 }
 
-void View::view_chatrooms(){
+string View::view_chatrooms(){
     string header = R"(
-XXXXXXXXX
-CHATROOMS
-XXXXXXXXX
-
-)";
+  )";
+    header += "  ";
     header += server.display_chatrooms();
-    cout << header;
+    return header;
 }
 
-void View::display_messages(Chatroom* chatroom){
+string View::display_messages(Chatroom* chatroom){
 
     string header = R"(
-XXXXXXXX
-MESSAGES
-XXXXXXXX
-
-)";
+  )";
     for(auto x : chatroom->get_messages()){
+        header += " ";
         header += x;
         header += "\n";
     }
-    cout << header;
+    return header;
     
 }
 
-void View::no_user_prompt(){
-    cout << "No user found.\n";
+string View::no_user_prompt(){
+    return "No user found.\n";
 }
 
-void View::chatroom_name_prompt(){
-    cout << "Enter a chatroom name: ";
-}
-void View::chatroom_not_found_prompt(){
-    cout << "Chatroom not found.\n";
+string View::chatroom_name_prompt(){
+    return "Enter a chatroom name: ";
 }
 
-void View::invalid_entry(){
-    cout << "Invalid input. Please select a correct option.\n";
+string View::chatroom_not_found_prompt(){
+    return "Chatroom not found. Enter a name from the above list.";
 }
 
-void View::message_prompt(){
-    cout << "Enter message: ";
+string View::invalid_entry(){
+    return "Invalid input. Please select a correct option.\n";
 }
 
-void View::maxed_users_prompt(){
-    cout << "Maxed users reached. Try again later.\n";
+string View::message_prompt(){
+    return "Enter message: ";
+}
+
+string View::maxed_users_prompt(){
+    return "Maxed users reached. Join a different chatroom.";
 }
 
 string View::too_long_prompt(){
-    return "Username is too long.";
+    return "Username can be no more than 50 characters.\n";
 }
 
 string View::user_already_exists(){
     return "Username already taken.";
+}
+
+string View::maxed_chatrooms_prompt(){
+    return "Chatroom limit reached. A chatroom must be deleted in order to create a new one.";
+}
+
+string View::chatname_already_exists(){
+    return "Chatname already exists.\n";
+}
+
+string View::no_privileges_prompt(){
+    return "Must have moderator or admin privileges.\n";
 }

@@ -78,6 +78,8 @@ void Window::start(){
 
     }while(valid_username != 1);
 
+    user->setUsername(username);
+
     wclear(input_window);
     wrefresh(input_window);
     wclear(user_name_window);
@@ -99,9 +101,6 @@ void Window::main_page(User* user, WINDOW* main){
     wrefresh(main);
     box(main,0,0);
     wrefresh(main);
-    map<Chatroom*, int> Rooms;
-    Rooms = server.get_chatrooms();
-    //controller.create_chatroom();
 
     int grid_height = main_height/2;
     int grid_width = main_width/2 - 4;
@@ -109,12 +108,20 @@ void Window::main_page(User* user, WINDOW* main){
     vector <string> message_list;
     string helper;
     string user_colon = user->getUsername() + ": ";
-    string choices[4] = {"1 - Join Chat", "2 - Create Chat", "3 - Delete Chat", "4 - Change Username"};
+    string choices[5] = {"1 - Join Chat", "2 - Create Chat", "3 - Delete Chat", "4 - Change Username", "5 - Remove User from Superchat (Admin Priv.)"};
 
     WINDOW* chatroom_grid = newwin(grid_height, grid_width, 1, 1);
     WINDOW* lobby_grid = newwin(grid_height, grid_width, 1, main_width/2 + 2);
-    WINDOW* menu_grid = newwin(grid_height/2+1, grid_width, grid_height + 1, 1);
-    WINDOW* input_box = newwin(grid_height * .2+1, grid_width - 4, grid_height - grid_height* .2, grid_width + 8);
+
+
+    //menu info just to make it easier for later
+    int menu_height = grid_height/2+1;
+    int menu_width = grid_width;
+    int menu_x = grid_height + 1;
+    int menu_y = 1;
+    WINDOW* menu_grid = newwin(menu_height, menu_width, menu_x, menu_y);
+
+    WINDOW* input_box = newwin(grid_height * .2+1, grid_width - 4, (grid_height - grid_height* .2) - 1, grid_width + 8);
     refresh();
     //wrefresh(main);
     box(chatroom_grid, 0, 0);
@@ -145,7 +152,7 @@ void Window::main_page(User* user, WINDOW* main){
     int c;
     int highlight = 0;
     int selection;
-    int menu_mode = 0, lobby_mode = 1, temp, esc_pressed = 0;
+    int menu_mode = 1, lobby_mode = 0, temp, esc_pressed = 0;
 
     //prints list the first time
 /*    for(int i = 0; i < 4; i++){
@@ -169,19 +176,14 @@ void Window::main_page(User* user, WINDOW* main){
         int menu_printed = 0;
 
         while (lobby_mode){
-            Rooms = server.get_chatrooms();
-            for (auto x: Rooms){
-                helper = (*(x.first)).get_name();
-                strcpy(display, helper.c_str());
-                //display = output.str();
-                mvwprintw(chatroom_grid, i + 2, 1, display);
-
-            }
+            curs_set(true); 
+            string display = view.view_chatrooms();
+            mvwprintw(chatroom_grid, 2, 2, display.c_str());
+            box(chatroom_grid, 0, 0);
             wrefresh(chatroom_grid);
-            wmove(input_box, 1, user->getUsername().size()+2);
+            wmove(input_box, (grid_height*.2)/2, user->getUsername().size()+2);
             c = wgetch(input_box);
             echo();
-            curs_set(2);
             //if tab is pressed
             if(c == 9 ){
                 //temp = menu_mode; 
@@ -196,19 +198,19 @@ void Window::main_page(User* user, WINDOW* main){
             }
             if(c == 32){
                 wgetstr(input_box, message);
-                //printw(message);
-                //(*(Rooms.at(0))).add_message(message);
-                //message_list = (*(Rooms.at(0))).get_messages();
-                if(message_list.size() >= 10)
-                    i = message_list.size() - 10;
-                else
-                    i = 0;
-                for(i; i < message_list.size(); i++){
-                    wattroff(menu_grid,A_REVERSE);
-                    //mvwprintw(lobby_grid, i + 2, 1, message_list.at(i));
-                } 
+                wclear(input_box);
+                box(input_box, 0, 0);
+                mvwprintw(input_box, (grid_height * .2) / 2, 1, user_colon.c_str());
+                wrefresh(input_box);
+                controller.add_message(message, user);
+                string messages = controller.display_messages(user);
+                mvwprintw(lobby_grid, 2, 2, messages.c_str());
+                box(lobby_grid, 0, 0);
+                box(input_box, 0, 0);
+                wrefresh(lobby_grid);
+                wrefresh(input_box);
 
-                mvwprintw(input_box, 1, user->getUsername().size()+2,space);
+                wmove(input_box, (grid_height*.2) / 2, user->getUsername().size()+2);
                 wrefresh(input_box);
             } 
 
@@ -218,12 +220,16 @@ void Window::main_page(User* user, WINDOW* main){
                 noecho();
         }
         while (menu_mode){
+                string display = view.view_chatrooms();
+                mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                box(chatroom_grid, 0, 0);
+                wrefresh(chatroom_grid);
                 noecho();
                 if(!menu_printed)
                 {
                     mvwprintw(menu_grid, 1, grid_width/2, "MENU");
                     box(menu_grid, 0, 0);
-                    for(int i = 0; i < 4; i++){
+                    for(int i = 0; i < 5; i++){
                             wattroff(menu_grid,A_REVERSE);
                         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
                         } 
@@ -235,13 +241,6 @@ void Window::main_page(User* user, WINDOW* main){
 
                     
                 
-                Rooms = server.get_chatrooms();
-                for (auto x: Rooms){
-                    helper = (*(x.first)).get_name();
-                    strcpy(display, helper.c_str());
-                    mvwprintw(chatroom_grid, i + 2, 1, display);
-
-                }
                 wrefresh(chatroom_grid);
                 curs_set(false);
                 c = wgetch(menu_grid);
@@ -255,54 +254,283 @@ void Window::main_page(User* user, WINDOW* main){
                     wrefresh(menu_grid);
                 } 
                 //if escape is pressed
-                if(c == 27 ){
+                else if(c == 27 ){
                     //turns off menu and chatroom mode, exiting the window
                     lobby_mode = 0;
                     menu_mode = 0;
                 }
                 //1 - Join Chatroom
+                else if (c == 49){
+                    wmove(menu_grid, menu_height -3, 1);
+                    wclrtoeol(menu_grid);
+                    wmove(menu_grid, menu_height -2, 1);
+                    wclrtoeol(menu_grid);
+                    box(menu_grid, 0, 0);
+                    wrefresh(menu_grid);
+                    int valid_chatname;
+                    bool chatFull;
+                    char chatname[80];
+                    mvwprintw(menu_grid, menu_height - 2 , 2, view.chatroom_name_prompt().c_str());
+                    wrefresh(menu_grid);
+                    curs_set(true);
+                    wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                    echo();
+
+
+                    wgetstr(menu_grid, chatname);
+                    do{
+                        //this validates if the user entered the name of a chatroom that actually exists, and whether or not 10 or less people are in it.
+                        valid_chatname = controller.checkChatName(chatname);
+                        if(valid_chatname == 3){
+                            mvwprintw(menu_grid, menu_height - 3, 2, view.chatroom_not_found_prompt().c_str());
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            echo();
+                            wgetstr(menu_grid, chatname);
+                        }
+                        else if (valid_chatname == 2){
+                            mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_users_prompt().c_str());
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            echo();
+                            wgetstr(menu_grid, chatname);
+                        }
+                        else{
+                            controller.add_user_to_chatroom(user, chatname);
+                            display = view.view_chatrooms();
+                            mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                            box(chatroom_grid, 0, 0);
+                            wrefresh(chatroom_grid);
+                            wmove(menu_grid, menu_height -3, 1);
+                            wclrtoeol(menu_grid);
+                            wmove(menu_grid, menu_height -2, 1);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            chatroom_window(user);
+                        }
+                    }while(valid_chatname != 1);
+                }
                 //2 - Create Chatroom
-                //3 - Delete Chatroom
-                //4 - Change Username  
-                switch( c ) {
-                    //Join Chatroom
-                    case 1:
-                     //           chatroom_mode = 0;
-                    //menu_mode = 0;
-                                //Controller.add_user_to_chatroom()
-                                break;
-                    //Create Chatroom
-                    case 2:
-                    //chatroom_mode = 0;
-                    //menu_mode = 0;     
-                                //Controller.create_chatroom()
-
-                                break;
-                    //Delete Chatroom
-                    case 3:
-                    //chatroom_mode = 0;
-                    //menu_mode = 0;
-                                break;
-                    //Change Username
-                    case 4:
-                    //chatroom_mode = 0;
-                   // menu_mode = 0;
-                                //string new_Username;
-                                //Controller.edit_username(username,)
-                                break;                                        
-                    default:
-                                break;
-                                }
-
-                // now highlight the next item in the list.
-    /*            wattron( menu_grid, A_REVERSE );
-                wrefresh(menu_grid);
-                mvwprintw(menu_grid, i+2, 1, choices[i].c_str());
-                wattroff( menu_grid, A_REVERSE );
-                wrefresh(menu_grid);*/
+                else if (c == 50){
+                    wmove(menu_grid, menu_height -3, 1);
+                    wclrtoeol(menu_grid);
+                    wmove(menu_grid, menu_height -2, 1);
+                    wclrtoeol(menu_grid);
+                    box(menu_grid, 0, 0);
+                    wrefresh(menu_grid);
+                    int valid;
+                    char chatname[80];
+                    mvwprintw(menu_grid, menu_height - 2 , 2, view.chatroom_name_prompt().c_str());
+                    wrefresh(menu_grid);
+                    curs_set(true);
+                    wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                    echo();
+                    
+                    wgetstr(menu_grid, chatname);
+                    do{
+                        
+                        //this validates whether the chatroom name already exists, or if 10 chatrooms has already been created.
+                        valid = controller.validate_chatname(chatname);
+                        if(valid == 2){
+                            mvwprintw(menu_grid, menu_height - 3, 2, view.chatname_already_exists().c_str());
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            echo();
+                            wgetstr(menu_grid, chatname);
+                        }
+                        else if (valid == 3){
+                            mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_chatrooms_prompt().c_str());
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            echo();
+                            wgetstr(menu_grid, chatname);
+                        }
+                        else{
+                            controller.create_chatroom(chatname);
+                            display = view.view_chatrooms();
+                            mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                            box(chatroom_grid, 0, 0);
+                            wrefresh(chatroom_grid);
+                        }
+                    }while(valid != 1);
+                }
         }
 
 
     //getch();
+    }
 }
+
+void Window::chatroom_window(User*user){
+	
+
+	//User* user, WINODW* main
+	string username = user->getUsername();
+	string lobbyNameString = user->get_room();
+	string currentUserString = "CURRENT USERS";
+	string menuString = "MENU";
+	//Begin NCurses
+	initscr();
+	raw();
+
+
+	int starty, startx;
+	starty = startx = 0;
+	int yMax, xMax;
+	getmaxyx(stdscr, yMax, xMax);
+	box(stdscr, 0, 0);
+	refresh();
+
+	//setting up what will be in sendMessageBox
+	string userMessageName = username + ": ";
+	char text[80];
+	string textString;
+
+
+	//window for sending messsages in lobby	
+	WINDOW* sendMessageBox = newwin((yMax/10), (xMax/3)*2, yMax-6, startx+2);
+	WINDOW* messageBox = newwin((yMax/17)*16, (xMax/3)*2, 1, 2);
+	WINDOW* currentUserBox = newwin((yMax/17)*15, (xMax/7)*2, 1, xMax-31);
+	WINDOW* menuBox = newwin((yMax/10)*1.7, (xMax/7)*2, yMax-9, xMax-31);
+	WINDOW* banUserBox = newwin(yMax/10*1.7, (xMax/7)*2, yMax-9, xMax-31);
+
+	box(sendMessageBox, 0, 0);	
+	box(messageBox, 0, 0);
+	box(currentUserBox, 0, 0);
+	box(menuBox, 0, 0);
+	
+	getmaxyx(currentUserBox, yMax, xMax);
+	mvwprintw(currentUserBox, 1, (xMax/2)-(currentUserString.size()/2), currentUserString.c_str());
+	getmaxyx(messageBox, yMax, xMax);
+	mvwprintw(messageBox, 1, (xMax/2)-(lobbyNameString.size()/2), lobbyNameString.c_str());
+	getmaxyx(menuBox, yMax, xMax);
+	mvwprintw(menuBox, 1, (xMax/2)-(menuString.size()/2), menuString.c_str());
+	mvwprintw(menuBox, 3, 1, "1 - Ban User");
+	mvwprintw(menuBox, 4, 1, "0 - Exit Chatroom");
+	mvwprintw(menuBox, 5, 1, "[TAB] - Message/Menu Mode");	
+	mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+	
+	// settiing up the windows for display
+	wrefresh(sendMessageBox);
+	wrefresh(messageBox);
+	wrefresh(currentUserBox);
+	wrefresh(menuBox);	
+
+	int i = 2, menuMode = 0, chatMode = 1, modeSwitch;
+	do{
+		mvwprintw(currentUserBox, 2, 1, username.c_str());
+		wrefresh(currentUserBox);
+		curs_set(false);
+		while(chatMode){
+			//curs_set(false);
+			noecho();
+			modeSwitch = wgetch(menuBox);
+			while(modeSwitch != 9){
+
+				echo();
+				box(sendMessageBox, 0, 0);
+				mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+				wmove(sendMessageBox, userMessageName.size(), 2);
+				curs_set(true);	
+				wgetstr(sendMessageBox, text);
+				textString = text;
+				modeSwitch = textString.front();
+				wclear(sendMessageBox);
+				box(sendMessageBox, 0, 0);
+				wrefresh(sendMessageBox); //refresh to view blank screen
+				if(textString.front() != 9){
+					mvwprintw(messageBox, i, 1, userMessageName.c_str());
+					mvwprintw(messageBox, i, userMessageName.size()+1, text); //print what is being written in the messages window
+					wmove(messageBox, i++, 1);}
+				wrefresh(messageBox);
+			}
+			if(modeSwitch == 9){
+				chatMode = 0;
+				menuMode = 1;
+				werase(sendMessageBox);
+				wrefresh(sendMessageBox);
+				
+			}
+			if(modeSwitch == 27){
+				chatMode = 0;
+				menuMode = 0;
+			}
+		}
+		while(menuMode){
+			curs_set(false);
+			noecho();
+			getmaxyx(menuBox, yMax, xMax);
+			mvwprintw(menuBox, 1, (xMax/2)-(menuString.size()/2), menuString.c_str());
+			mvwprintw(menuBox, 3, 1, "1 - Ban User");
+			mvwprintw(menuBox, 4, 1, "0 - Exit Chatroom");
+		       	mvwprintw(menuBox, 5, 1, "[TAB] - Message/Menu Mode");	
+			box(menuBox, 0, 0);
+			wrefresh(menuBox);
+			modeSwitch = wgetch(menuBox);
+			//when tab is pressed
+			if(modeSwitch == 9){
+				chatMode = 1;
+				menuMode = 0;
+				werase(menuBox);
+				wrefresh(menuBox);
+				box(sendMessageBox, 0, 0);
+				mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+				wmove(sendMessageBox, userMessageName.size(), 2);
+				wrefresh(sendMessageBox);
+			}
+			if(modeSwitch == 27){
+				chatMode = 0;
+				menuMode = 0;
+			}
+			
+            //ban user
+			if(modeSwitch == 49){
+				werase(menuBox);
+				box(banUserBox, 0, 0);
+				wrefresh(menuBox);
+				wrefresh(banUserBox);
+
+			}
+			if(modeSwitch == 48){
+				//exit chatroom
+			}
+		}
+		
+
+		//This is working properly
+		//Just trying to fix other things
+
+		
+
+		/*mvwprintw(currentUserBox, 2, 1, username.c_str());
+		wrefresh(currentUserBox);
+		mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
+		wmove(sendMessageBox, userMessageName.size(), 2);	
+		box(sendMessageBox, 0, 0);
+		wgetstr(sendMessageBox, text);
+		wclear(sendMessageBox);
+		wrefresh(sendMessageBox); //refresh to view blank screen
+		mvwprintw(messageBox, i, 1, userMessageName.c_str());
+		mvwprintw(messageBox, i, userMessageName.size()+1, text); //print what is being written in the messages window
+		wmove(messageBox, i++, 1);
+		wrefresh(messageBox);
+		*/
+		
+	}while(true);
+
+	getch();
+	endwin();
 }

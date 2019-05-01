@@ -7,7 +7,7 @@ class Window{
         Window(Controller& con, Server& serv, View& v) : controller(con), server(serv), view(v){};
         void start();
         void main_page(User*, WINDOW*);
-        void lobby_chat(WINDOW*);
+        void chatroom_window(User*); 
 
     private: 
         Controller& controller;

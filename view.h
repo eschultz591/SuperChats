@@ -4,18 +4,21 @@ class View{
     public: 
         View(Server& serv) : server(serv){};
         string get_menu();
-        void username_prompt();
+        string username_prompt();
         string view_current_users();
         string too_long_prompt();
         string user_already_exists();
-        void no_user_prompt();
-        void chatroom_name_prompt();
-        void view_chatrooms();
-        void chatroom_not_found_prompt();
-        void invalid_entry();
-        void message_prompt();
-        void display_messages(Chatroom*);
-        void maxed_users_prompt();
+        string no_user_prompt();
+        string chatroom_name_prompt();
+        string view_chatrooms();
+        string chatroom_not_found_prompt();
+        string invalid_entry();
+        string message_prompt();
+        string display_messages(Chatroom*);
+        string maxed_users_prompt();
+	string maxed_chatrooms_prompt();
+	string chatname_already_exists();
+	string no_privileges_prompt();
     private: 
         Server& server;
 };

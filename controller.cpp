@@ -18,83 +18,6 @@ void Controller::setup(User* user){
     
 }
 
-void Controller::interface(){
-    int cmd = 0;
- 
-    do{
-        cout << view.get_menu();
-        cin >> cmd;
-        while(true){
-            if(cin.fail()){
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                view.invalid_entry();
-                view.get_menu();
-                cin >> cmd;
-            }
-            if(!cin.fail()){
-                break;
-            }
-        }
-        
-        execute_cmd(cmd);
-
-    } while(cmd != 0);
-}
-
-void Controller::execute_cmd(int cmd){
-    switch(cmd){
-        case 0:
-            break;
-        case 1:
-            create_user();
-            break;
-        case 2:
-            remove_user_from_server();
-            break;
-        case 3:
-            user_to_mod();
-            break;
-        case 4:
-            view.view_current_users();
-            break;
-        case 5:
-            create_chatroom();
-            break;
-        case 6:
-            view.view_chatrooms();
-            break;
-        case 7: 
-            add_user_to_chatroom();
-            break;
-        case 8:
-            remove_chatroom();
-            break;
-        case 9:
-            boot_user_to_lobby();
-            break;
-        case 10:
-            add_message();
-            break;
-        case 11:
-            display_messages();
-            break;
-        default: 
-            view.invalid_entry();
-            break;
-    }
-}
-
-void Controller::create_user(){
-    string username;
-    view.username_prompt();
-    cin >> username;
-    while(check_Username(username) == false); 
-    User* user = new User();
-    user->setUsername(username);
-    server.add_user(user);
-    auto_add_user_to_lobby(user);
-}
 
 int Controller::check_Username(string u_n){
 	//checking the length
@@ -159,64 +82,28 @@ void Controller::auto_add_user_to_lobby(User* user){
     }
 }
 
-void Controller::add_user_to_chatroom(){
-    string username, chatroom_name, users_current_chatroom;
-    User* user;
-    bool foundChat = false;
-    bool foundUser = false;
-    bool room_full = false;
-
-    view.username_prompt();
-    cin >> username;
-     
-    for(auto x : server.get_users()){
-        if(x->getUsername() == username){
-            users_current_chatroom = x->get_room();
-            user = x;
-            foundUser = true;
-            break;
+void Controller::add_user_to_chatroom(User* user, string chatname){
+    
+    //first remove user from current room
+    for(auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == user->get_room()){
+            x.first->remove_user(user->getUsername());
+                x.second--;
+                break;
         }
     }
 
-    if(!foundUser){
-        view.no_user_prompt();
-    }
-    else{
-        view.chatroom_name_prompt();
-        cin >> chatroom_name;
-
-        //this loop makes sure chatroom user wants to join has space
+        //this loop adds user to new room
         for(auto&&x : server.get_chatrooms()){
-            if(x.first->get_name() == chatroom_name){
-                if(x.first->checkNumUsers() == true){
-                    view.maxed_users_prompt();
-                    room_full = true;
-                }
-                else{
+            if(x.first->get_name() == chatname){
                     x.first->add_user(user);
                     x.second++;
-                }
-                foundChat = true;
-                break;
-            }
-        }
-
-        //this loop removes user from current chatroom
-        if(!room_full){
-            for(auto&&x : server.get_chatrooms()){
-                if(x.first->get_name() == users_current_chatroom){
-                    x.first->remove_user(user->getUsername());
-                    x.second--;
+                    user->set_room(chatname);
                     break;
                 }
-            }
         }
-        
-        if(!foundChat){
-            view.chatroom_not_found_prompt();
-        }
-    }
 }
+
 
 void Controller::remove_user_from_server(){
     string username;
@@ -277,18 +164,9 @@ void Controller::user_to_mod(){
     }
 }
 
-void Controller::create_chatroom(){
-    string name;
-    view.chatroom_name_prompt();
-    cin >> name;
-    if(server.checkNumChatrooms() == true){
-        throw runtime_error("Chatroom limit reached.\n");
-    }
-    if (checkChatName(name) == true){
-        throw runtime_error("Chatname already exists.\n");
-    }
+void Controller::create_chatroom(string chatname){
     Chatroom* chatroom = new Chatroom();
-    chatroom->set_name(name);
+    chatroom->set_name(chatname);
     server.add_chatroom(chatroom);
 }
 
@@ -360,54 +238,90 @@ void Controller::boot_user_to_lobby(){
     }
 }
 
-void Controller::add_message(){
-    string text;
-    string full_message;
-    string what_room_are_we_in;
-    bool foundChat = false;
-    static int t = 1;
-    view.message_prompt();
-    cin.ignore();
-    std::getline(cin, text);
-    //cin >> text;
+void Controller::add_message(string text, User* user){
 
-    view.chatroom_name_prompt();
-    cin >> what_room_are_we_in;
-    
-    Message* m = new Message(text, t);
-    full_message = m->to_string();
+    Message* m = new Message(text);
+    string message_as_string = m->get_message();
     delete m;
 
     for(auto&&x : server.get_chatrooms()){
-        if(x.first->get_name() == what_room_are_we_in){
-            x.first->add_message(full_message);
-        }
-    }
-    t++;
-}
-
-void Controller::display_messages(){
-    string chatroom_name;
-    bool chatroom_found = false;
-    view.chatroom_name_prompt();
-    cin >> chatroom_name;
-    for(auto&&x : server.get_chatrooms()){
-        if(x.first->get_name() == chatroom_name){
-            view.display_messages(x.first); 
-            chatroom_found = true;
+        if(x.first->get_name() == user->get_room()){
+            x.first->add_message(message_as_string);
             break;
         }
     }
-    if(!chatroom_found){
-        view.chatroom_not_found_prompt();
-    }
 }
 
-bool Controller::checkChatName(string chatroom) {
+string Controller::display_messages(User* user){
+
+    string messages;
+
+    for(auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == user->get_room()){
+            messages = view.display_messages(x.first); 
+            break;
+        }
+    }
+    return messages;
+}
+
+int Controller::checkChatName(string chatroom) {
+    int valid;
+    bool found_chat = false;
     for (auto x : server.get_chatrooms()) {
-	    if (x.first->get_name() == chatroom)
-	        return true;
-	    else
-	        return false;
+	    if (x.first->get_name() == chatroom){
+
+	        if(x.second >= 10){
+                valid = 2;
+            }
+            else{
+                valid = 1;
+            }
+            found_chat = true;
+            break;
+        }
 	}
+        if (!found_chat){
+            valid = 3;
+        }
+    return valid;
 }  
+
+int Controller::validate_chatname(string chatname){
+    int valid = 1;
+    //if chatroom name does not exist (GOOD! USER CAN CREATE CHAT)
+
+    for (auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == chatname){
+            valid = 2;
+            break;
+        }
+    }
+    if(server.get_chatrooms().size() >= 10){
+        valid = 3;
+    }
+    return valid;
+}
+
+bool Controller::chatroom_full(string chatname){
+    bool isFull;
+    for(auto&&x : server.get_chatrooms()){
+        if (x.first->get_name() == chatname){
+            if(x.second >= 10){
+                isFull = true;
+                break;
+            }
+        }
+    }
+    return isFull;
+}
+/*void Controller::create_user(){
+    string username;
+    view.username_prompt();
+    cin >> username;
+    while(check_Username(username) == false); 
+    User* user = new User();
+    user->setUsername(username);
+    server.add_user(user);
+    auto_add_user_to_lobby(user);
+}*/
