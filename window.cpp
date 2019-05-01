@@ -65,6 +65,7 @@ void Window::start(){
             wrefresh(user_name_window);
             box(user_name_window,0,0);
             mvwprintw(user_name_window, 1, user_width/2 - view.too_long_prompt().length()/2, view.too_long_prompt().c_str());
+            box(user_name_window, 0, 0);
             wrefresh(user_name_window);
             wclear(input_window);
             box(input_window,0,0);
@@ -104,7 +105,7 @@ void Window::main_page(User* user, WINDOW* main){
 
     int grid_height = main_height/2;
     int grid_width = main_width/2 - 4;
-    char message[80], display[80], space[45] = {0}, new_username[80];
+    char message[80], display[80], space[80] = {0};
     vector <string> message_list;
     string helper;
     string user_colon = user->getUsername() + ": ";
@@ -313,7 +314,7 @@ void Window::main_page(User* user, WINDOW* main){
                             wclrtoeol(menu_grid);
                             box(menu_grid, 0, 0);
                             wrefresh(menu_grid);
-                            chatroom_window(user);
+                            chatroom_window(user, main);
                         }
                     }while(valid_chatname != 1);
                 }
@@ -327,6 +328,7 @@ void Window::main_page(User* user, WINDOW* main){
                     wrefresh(menu_grid);
                     int valid;
                     char chatname[80];
+                    bool too_many = false;
                     mvwprintw(menu_grid, menu_height - 2 , 2, view.chatroom_name_prompt().c_str());
                     wrefresh(menu_grid);
                     curs_set(true);
@@ -354,12 +356,16 @@ void Window::main_page(User* user, WINDOW* main){
                             wclrtoeol(menu_grid);
                             box(menu_grid, 0, 0);
                             wrefresh(menu_grid);
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            echo();
-                            wgetstr(menu_grid, chatname);
+                            valid = 1;
                         }
                         else{
                             controller.create_chatroom(chatname);
+                            wmove(menu_grid, menu_height -3, 1);
+                            wclrtoeol(menu_grid);
+                            wmove(menu_grid, menu_height -2, 1);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
                             display = view.view_chatrooms();
                             mvwprintw(chatroom_grid, 2, 2, display.c_str());
                             box(chatroom_grid, 0, 0);
@@ -367,23 +373,40 @@ void Window::main_page(User* user, WINDOW* main){
                         }
                     }while(valid != 1);
                 }
+                //delete chat
+                else if (c == 51){
+                    bool user_status = user->getAdmin();
+                    int chat_exists = controller.validate_chatname(user->get_room());
+
+                    wmove(menu_grid, menu_height -3, 1);
+                    wclrtoeol(menu_grid);
+                    wmove(menu_grid, menu_height -2, 1);
+                    wclrtoeol(menu_grid);
+                    box(menu_grid, 0, 0);
+                    wrefresh(menu_grid);
+
+
+
+                    
+                }
+
                 else if (c == 52)
                 {
-
+                    char new_username[80];
                     int valid_username;
                     do{
                         wclrtoeol(menu_grid);
                         wrefresh(menu_grid);
                         wclear(menu_grid);
                         box(menu_grid, 0, 0);
-                        mvwprintw(menu_grid, 1, grid_width/2-5, "ENTER USERNAME");
+                        mvwprintw(menu_grid, 1, grid_width/2-7, "ENTER USERNAME");
 /*                        for(int i = 0; i < 5; i++){
                             wattroff(menu_grid,A_REVERSE);
                             mvwprintw(menu_grid, i + 2, 1, "                                              ");
                         } */
                         echo();
-                        mvwprintw(menu_grid,2,1,"New Username:");
-                        wmove(menu_grid, 2, 15);
+                        mvwprintw(menu_grid,2,1,view.username_prompt().c_str());
+                        wmove(menu_grid, 2, view.username_prompt().size() + 2);
                         wgetstr(menu_grid, new_username);
                         valid_username = controller.check_Username(new_username);
 
@@ -411,17 +434,15 @@ void Window::main_page(User* user, WINDOW* main){
 
                 }
         }
-
-
-    //getch();
     }
 }
 
-void Window::chatroom_window(User*user){
+void Window::chatroom_window(User*user, WINDOW* main){
 	
 
 	//User* user, WINODW* main
 	string username = user->getUsername();
+	string currentUsername = username;
 	string lobbyNameString = user->get_room();
 	string currentUserString = "CURRENT USERS";
 	string menuString = "MENU";
@@ -439,16 +460,19 @@ void Window::chatroom_window(User*user){
 
 	//setting up what will be in sendMessageBox
 	string userMessageName = username + ": ";
+	if(user->getMod() == true)
+		currentUsername = username + "[MOD]";
+	else
+		currentUsername = username;
 	char text[80];
 	string textString;
 
-
 	//window for sending messsages in lobby	
-	WINDOW* sendMessageBox = newwin((yMax/10), (xMax/3)*2, yMax-6, startx+2);
-	WINDOW* messageBox = newwin((yMax/17)*16, (xMax/3)*2, 1, 2);
-	WINDOW* currentUserBox = newwin((yMax/17)*15, (xMax/7)*2, 1, xMax-31);
-	WINDOW* menuBox = newwin((yMax/10)*1.7, (xMax/7)*2, yMax-9, xMax-31);
-	WINDOW* banUserBox = newwin(yMax/10*1.7, (xMax/7)*2, yMax-9, xMax-31);
+	WINDOW* sendMessageBox = newwin((yMax/17)*2, (xMax/3)*2, ((yMax/17)*15)+1, startx+2);
+	WINDOW* messageBox = newwin((yMax/17)*15, (xMax/3)*2, 1, 2);
+	WINDOW* currentUserBox = newwin((yMax/17)*14, (xMax/7)*2, 1, ((xMax/3)*2)+3);
+	WINDOW* menuBox = newwin((yMax/10)*1.7, (xMax/7)*2, yMax-9, ((xMax/3)*2)+3);
+	WINDOW* banUserBox = newwin(yMax/10*1.7, (xMax/7)*2, yMax-9, ((xMax/3)*2)+3);
 
 	box(sendMessageBox, 0, 0);	
 	box(messageBox, 0, 0);
@@ -474,7 +498,7 @@ void Window::chatroom_window(User*user){
 
 	int i = 2, menuMode = 0, chatMode = 1, modeSwitch;
 	do{
-		mvwprintw(currentUserBox, 2, 1, username.c_str());
+		mvwprintw(currentUserBox, 2, 1, currentUsername.c_str());
 		wrefresh(currentUserBox);
 		curs_set(false);
 		while(chatMode){
@@ -482,7 +506,6 @@ void Window::chatroom_window(User*user){
 			noecho();
 			modeSwitch = wgetch(menuBox);
 			while(modeSwitch != 9){
-
 				echo();
 				box(sendMessageBox, 0, 0);
 				mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
@@ -505,11 +528,6 @@ void Window::chatroom_window(User*user){
 				menuMode = 1;
 				werase(sendMessageBox);
 				wrefresh(sendMessageBox);
-				
-			}
-			if(modeSwitch == 27){
-				chatMode = 0;
-				menuMode = 0;
 			}
 		}
 		while(menuMode){
@@ -537,9 +555,11 @@ void Window::chatroom_window(User*user){
 			if(modeSwitch == 27){
 				chatMode = 0;
 				menuMode = 0;
+
+                controller.add_user_to_chatroom(user, "Lobby");
+    			main_page(user, main);
+
 			}
-			
-            //ban user
 			if(modeSwitch == 49){
 				werase(menuBox);
 				box(banUserBox, 0, 0);
@@ -551,13 +571,8 @@ void Window::chatroom_window(User*user){
 				//exit chatroom
 			}
 		}
-		
-
 		//This is working properly
 		//Just trying to fix other things
-
-		
-
 		/*mvwprintw(currentUserBox, 2, 1, username.c_str());
 		wrefresh(currentUserBox);
 		mvwprintw(sendMessageBox, 2, 2, userMessageName.c_str());
@@ -571,8 +586,7 @@ void Window::chatroom_window(User*user){
 		wmove(messageBox, i++, 1);
 		wrefresh(messageBox);
 		*/
-		
-	}while(true);
+	}while(modeSwitch != 27);
 
 	getch();
 	endwin();

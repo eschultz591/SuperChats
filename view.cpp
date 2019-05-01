@@ -80,7 +80,7 @@ string View::maxed_users_prompt(){
 }
 
 string View::too_long_prompt(){
-    return "Username can be no more than 50 characters.\n";
+    return "Username can be no more than 15 characters.\n";
 }
 
 string View::user_already_exists(){

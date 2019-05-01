@@ -21,14 +21,13 @@ void Controller::setup(User* user){
 
 int Controller::check_Username(string u_n){
 	//checking the length
-	if((u_n.length()) > 5){		
+	if((u_n.length()) > 15){		
 		//cout << "Username is to long." << endl;
 		return 2;
 	}
 	//checking if user already exist
 	for(auto x: server.get_users()){
 		if(x->getUsername() == u_n){
-			cout << "Username already exist." << endl;
 			return 3;
 		}
 	}
@@ -41,14 +40,8 @@ void Controller::edit_username() {
     cin >> current_username;
     for (auto x : server.get_users()) {
         if(current_username == x->getUsername()) {
-            cout << "New username: ";
-            cin >> new_username;
-
-            // validate new username
-            /*if (x->checkUsername(new_username) == false)
-                 throw runtime_error{"Invalid username.\n"};*/
-
             x->setUsername(new_username);
+            break;
         }
     }
 }
@@ -289,7 +282,7 @@ int Controller::checkChatName(string chatroom) {
 
 int Controller::validate_chatname(string chatname){
     int valid = 1;
-    //if chatroom name does not exist (GOOD! USER CAN CREATE CHAT)
+    //will return 1 if no chatroom by that name exists. if chatroom name does not exist (GOOD! USER CAN CREATE CHAT)
 
     for (auto&&x : server.get_chatrooms()){
         if(x.first->get_name() == chatname){
