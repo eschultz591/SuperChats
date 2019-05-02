@@ -271,6 +271,7 @@ void Window::main_page(User* user, WINDOW* main){
                     int valid_chatname;
                     bool chatFull;
                     char chatname[80];
+                    bool isBanned;
                     mvwprintw(menu_grid, menu_height - 2 , 2, view.chatroom_name_prompt().c_str());
                     wrefresh(menu_grid);
                     curs_set(true);
@@ -280,42 +281,76 @@ void Window::main_page(User* user, WINDOW* main){
 
                     wgetstr(menu_grid, chatname);
                     do{
-                        //this validates if the user entered the name of a chatroom that actually exists, and whether or not 10 or less people are in it.
-                        valid_chatname = controller.checkChatName(chatname);
-                        if(valid_chatname == 3){
-                            mvwprintw(menu_grid, menu_height - 3, 2, view.chatroom_not_found_prompt().c_str());
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            wclrtoeol(menu_grid);
-                            box(menu_grid, 0, 0);
-                            wrefresh(menu_grid);
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            echo();
-                            wgetstr(menu_grid, chatname);
-                        }
-                        else if (valid_chatname == 2){
-                            mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_users_prompt().c_str());
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            wclrtoeol(menu_grid);
-                            box(menu_grid, 0, 0);
-                            wrefresh(menu_grid);
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            echo();
-                            wgetstr(menu_grid, chatname);
-                        }
-                        else{
-                            controller.add_user_to_chatroom(user, chatname);
-                            display = view.view_chatrooms();
-                            mvwprintw(chatroom_grid, 2, 2, display.c_str());
-                            box(chatroom_grid, 0, 0);
-                            wrefresh(chatroom_grid);
+                        
+
+                        if(strcmp(chatname, "quit") == 0){
+                            valid_chatname = 1;
                             wmove(menu_grid, menu_height -3, 1);
                             wclrtoeol(menu_grid);
                             wmove(menu_grid, menu_height -2, 1);
                             wclrtoeol(menu_grid);
                             box(menu_grid, 0, 0);
                             wrefresh(menu_grid);
-                            chatroom_window(user, main);
                         }
+                        else{
+                            //this validates if the user entered the name of a chatroom that actually exists, and whether or not 10 or less people are in it.
+                            valid_chatname = controller.checkChatName(chatname, user);
+
+                            if(valid_chatname == 3){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.chatroom_not_found_prompt().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+                            else if (valid_chatname == 2){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_users_prompt().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+                            else if(valid_chatname == 4){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.banned_prompt().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+                            else if(valid_chatname == 5){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.already_in_lobby().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+                            else{
+                                controller.add_user_to_chatroom(user, chatname);
+                                display = view.view_chatrooms();
+                                mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                                box(chatroom_grid, 0, 0);
+                                wrefresh(chatroom_grid);
+                                wmove(menu_grid, menu_height -3, 1);
+                                wclrtoeol(menu_grid);
+                                wmove(menu_grid, menu_height -2, 1);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                chatroom_window(user, main);
+                            }
+                        }    
                     }while(valid_chatname != 1);
                 }
                 //2 - Create Chatroom

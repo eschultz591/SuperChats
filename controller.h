@@ -20,11 +20,12 @@ class Controller{
         int check_Username(string);
         void edit_username();
         //to join chat validation
-        int checkChatName(string);
+        int checkChatName(string, User*);
 
         //to create chatroom validation
         int validate_chatname(string);
         bool chatroom_full(string);
+        bool check_if_user_is_banned(User*, string); 
 
 
         //these functions are not currently in use and may be deleted later

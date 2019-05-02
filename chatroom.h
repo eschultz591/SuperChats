@@ -14,6 +14,7 @@ class Chatroom{
         string to_string();
         void add_user(User*);
         void add_user_to_banned_list(User*);
+        vector<User*> get_banned_users();
         friend string get_name_for_friend();
         void remove_user(string);
         void add_message(string);

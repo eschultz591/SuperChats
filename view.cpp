@@ -60,7 +60,7 @@ string View::no_user_prompt(){
 }
 
 string View::chatroom_name_prompt(){
-    return "Enter a chatroom name: ";
+    return "Enter a chatroom name or \"quit\" to exit: ";
 }
 
 string View::chatroom_not_found_prompt(){
@@ -97,4 +97,12 @@ string View::chatname_already_exists(){
 
 string View::no_privileges_prompt(){
     return "Must have moderator or admin privileges.\n";
+}
+
+string View::banned_prompt(){
+    return "You have been banned from that chatroom. Join a different one.";
+}
+
+string View::already_in_lobby(){
+    return "You are already in the lobby. Join a different chatroom.";
 }

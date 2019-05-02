@@ -16,9 +16,11 @@ class View{
         string message_prompt();
         string display_messages(Chatroom*);
         string maxed_users_prompt();
-	string maxed_chatrooms_prompt();
-	string chatname_already_exists();
-	string no_privileges_prompt();
+        string maxed_chatrooms_prompt();
+        string chatname_already_exists();
+        string no_privileges_prompt();
+        string banned_prompt();
+        string already_in_lobby();
     private: 
         Server& server;
 };

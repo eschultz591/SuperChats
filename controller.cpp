@@ -240,28 +240,43 @@ string Controller::display_messages(User* user){
     return messages;
 }
 
-int Controller::checkChatName(string chatroom) {
+//this checks if the chat exists and if there is space to join (10 or less people)
+//FOR JOINING CHATROOMS
+int Controller::checkChatName(string chatroom, User* user) {
     int valid;
     bool found_chat = false;
-    for (auto x : server.get_chatrooms()) {
-	    if (x.first->get_name() == chatroom){
+    bool isBanned;
 
-	        if(x.second >= 10){
-                valid = 2;
+    isBanned = check_if_user_is_banned(user, chatroom);
+
+    if(isBanned){
+        valid = 4;
+    }
+    else if(chatroom == "Lobby"){
+        valid = 5;
+    }
+    else{
+        for (auto x : server.get_chatrooms()) {
+	        if (x.first->get_name() == chatroom){
+                if(x.second >= 10){
+                    valid = 2;
+                }
+                else{
+                    valid = 1;
+                }
+                found_chat = true;
+                break;
             }
-            else{
-                valid = 1;
-            }
-            found_chat = true;
-            break;
-        }
-	}
+	    }
         if (!found_chat){
             valid = 3;
         }
+    }
     return valid;
 }  
 
+
+//FOR CREATING CHAT ROOMS.
 int Controller::validate_chatname(string chatname){
     int valid = 1;
     //will return 1 if no chatroom by that name exists. if chatroom name does not exist (GOOD! USER CAN CREATE CHAT)
@@ -290,6 +305,24 @@ bool Controller::chatroom_full(string chatname){
     }
     return isFull;
 }
+
+bool Controller::check_if_user_is_banned(User* user, string chatname){
+    //find the right chatroom
+    for(auto&&x : server.get_chatrooms()){
+        if(x.first->get_name() == chatname){
+            //go through that chatroom's banned user list
+            for(auto y : x.first->get_banned_users()){
+                //if user is on list, return true
+                if (y->getUsername() == user->getUsername()){
+                    return true;
+                }
+            }
+        }
+    }
+    // if user is not banned, return false.
+    return false;
+}
+
 /*void Controller::create_user(){
     string username;
     view.username_prompt();
