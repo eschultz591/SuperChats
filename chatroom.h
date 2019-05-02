@@ -13,20 +13,16 @@ class Chatroom{
         void increment_num_users();
         string to_string();
         void add_user(User*);
+        void add_user_to_banned_list(User*);
         friend string get_name_for_friend();
         void remove_user(string);
         void add_message(string);
         vector<string> get_messages();
         bool checkNumUsers();
-        //bool checkChatName(string);
 
     private: 
         string name;
         vector<User*> current_users;
         vector<User*> banned_users;
         vector<string> messages;
-
-    string get_name_for_friend(){
-        return name;
-    }
 };

@@ -48,9 +48,6 @@ void Controller::edit_username() {
 
 
 void Controller::create_user_first_time(User* user){
-    //string username;
-    //view.username_prompt();
-    //cin >> username;
 
     //first user to log into server becomes admin
     int size = server.getUsers().size();
@@ -63,7 +60,7 @@ void Controller::create_user_first_time(User* user){
 
 void Controller::auto_add_user_to_lobby(User* user){
     string lobby = "Lobby";
-    //user->set_room(lobby);
+
 
     for(auto&&x : server.get_chatrooms()){
         if (lobby == x.first->get_name()){

@@ -40,6 +40,10 @@ void Chatroom::add_user(User* user){
     current_users.push_back(user);
 }
 
+void Chatroom::add_user_to_banned_list(User* user){
+    banned_users.push_back(user);
+}
+
 void Chatroom::remove_user(string username){
     int position = 0;
     bool found_user = false;
