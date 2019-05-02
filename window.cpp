@@ -557,6 +557,7 @@ void Window::chatroom_window(User*user, WINDOW* main){
 				menuMode = 0;
 
                 controller.add_user_to_chatroom(user, "Lobby");
+                //controller.boot_user_to_lobby(user); 
     			main_page(user, main);
 
 			}

@@ -197,37 +197,22 @@ void Controller::boot_users_to_lobby(Chatroom* chatroom){
         auto_add_user_to_lobby(x);
     }
 }
-void Controller::boot_user_to_lobby(){
-    string chatroom, user;
-    view.chatroom_name_prompt();
-    cin >> chatroom;
-    view.username_prompt();
-    cin >> user;
-    bool chatroom_found = false;
-    bool user_found = false;
+void Controller::boot_user_to_lobby(User* user){
+    
     for(auto&&x : server.get_chatrooms()){
-        if (x.first->get_name() == chatroom){
+        if (x.first->get_name() == user->get_room()){
             
             //this loop removes user from his current chatroom
             for(auto&&y : x.first->get_current_users()){
-                if(y->getUsername() == user){
-                    x.first->remove_user(user);
+                if(y->getUsername() == user->getUsername()){
+                    x.first->remove_user(user->getUsername());
                     x.second--;
                     auto_add_user_to_lobby(y);
-                    user_found = true;
                     break;
                 }
             }
-            chatroom_found = true;
             break;
         }
-    }
-
-    if(!user_found){
-        view.no_user_prompt();
-    }
-    if(!chatroom_found){
-        view.chatroom_not_found_prompt();
     }
 }
 

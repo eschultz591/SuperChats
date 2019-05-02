@@ -13,7 +13,7 @@ class Controller{
         void remove_chatroom();
         void create_lobby();
         void boot_users_to_lobby(Chatroom*);
-        void boot_user_to_lobby();
+        void boot_user_to_lobby(User*);
         void auto_add_user_to_lobby(User*);
         void add_message(string, User*); 
         string display_messages(User*);
