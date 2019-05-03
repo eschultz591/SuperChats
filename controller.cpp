@@ -86,11 +86,15 @@ void Controller::add_user_to_chatroom(User* user, string chatname){
         //this loop adds user to new room
         for(auto&&x : server.get_chatrooms()){
             if(x.first->get_name() == chatname){
+                if(x.second == 0){
+                    user->setMod();
+                }
                     x.first->add_user(user);
                     x.second++;
                     user->set_room(chatname);
                     break;
                 }
+            
         }
 }
 
