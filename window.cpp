@@ -339,6 +339,11 @@ void Window::main_page(User* user, WINDOW* main){
                             else{
                                 controller.add_user_to_chatroom(user, chatname);
                                 display = view.view_chatrooms();
+                                wclear(chatroom_grid);
+                                box(chatroom_grid, 0, 0);
+                                wattron(chatroom_grid, A_BLINK); 
+                                mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS"); 
+                                wattroff(chatroom_grid,A_BLINK);
                                 mvwprintw(chatroom_grid, 2, 2, display.c_str());
                                 box(chatroom_grid, 0, 0);
                                 wrefresh(chatroom_grid);
@@ -417,9 +422,15 @@ void Window::main_page(User* user, WINDOW* main){
                                 box(menu_grid, 0, 0);
                                 wrefresh(menu_grid);
                                 display = view.view_chatrooms();
+                                wclear(chatroom_grid);
+                                box(chatroom_grid, 0, 0);
+                                wattron(chatroom_grid, A_BLINK); 
+                                mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS"); 
+                                wattroff(chatroom_grid,A_BLINK);
                                 mvwprintw(chatroom_grid, 2, 2, display.c_str());
                                 box(chatroom_grid, 0, 0);
                                 wrefresh(chatroom_grid);
+                                
                             }
                         }
                     }while(valid != 1);
@@ -428,7 +439,7 @@ void Window::main_page(User* user, WINDOW* main){
                 else if (c == 51){
                     char chatname[80];
                     bool user_status = user->getAdmin();
-                    int valid;
+                    int valid = 0;
                     
                     //set up menu box
                     wmove(menu_grid, menu_height -3, 1);
@@ -457,8 +468,19 @@ void Window::main_page(User* user, WINDOW* main){
                             wrefresh(menu_grid);
                     
                         }
+                        //no one can delete lobby
+                        else if(strcmp(chatname, "Lobby") == 0){
+                            mvwprintw(menu_grid, menu_height - 3, 2, view.cannot_delete_lobby().c_str());
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                            echo();
+                            wgetstr(menu_grid, chatname);
+                        }
                         else{
-                            //validate_chatname returns a 1 if no chatroom exists.
+                            //validate_chatname() returns a 1 if NO chatroom exists.
                             int chat_exists = controller.validate_chatname(chatname);
                             if(chat_exists == 1){
                                 mvwprintw(menu_grid, menu_height - 3, 2, view.chatroom_not_found_prompt().c_str());
@@ -483,6 +505,11 @@ void Window::main_page(User* user, WINDOW* main){
                                     box(menu_grid, 0, 0);
                                     wrefresh(menu_grid);
                                     display = view.view_chatrooms();
+                                    wclear(chatroom_grid);
+                                    box(chatroom_grid, 0, 0);
+                                    wattron(chatroom_grid, A_BLINK); 
+                                    mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS"); 
+                                    wattroff(chatroom_grid,A_BLINK);
                                     mvwprintw(chatroom_grid, 2, 2, display.c_str());
                                     box(chatroom_grid, 0, 0);
                                     wrefresh(chatroom_grid);
@@ -520,6 +547,11 @@ void Window::main_page(User* user, WINDOW* main){
                                         box(menu_grid, 0, 0);
                                         wrefresh(menu_grid);
                                         display = view.view_chatrooms();
+                                        wclear(chatroom_grid);
+                                        box(chatroom_grid, 0, 0);
+                                        wattron(chatroom_grid, A_BLINK); 
+                                        mvwprintw(chatroom_grid, 1, grid_width / 2, "CHATROOMS"); 
+                                        wattroff(chatroom_grid,A_BLINK);
                                         mvwprintw(chatroom_grid, 2, 2, display.c_str());
                                         box(chatroom_grid, 0, 0);
                                         wrefresh(chatroom_grid);
@@ -587,7 +619,6 @@ void Window::chatroom_window(User*user, WINDOW* main){
 	string currentUserString = "CURRENT USERS";
 	string menuString = "MENU";
 	//Begin NCurses
-	initscr();
 	raw();
 
 
@@ -697,7 +728,6 @@ void Window::chatroom_window(User*user, WINDOW* main){
 				menuMode = 0;
 
                 controller.add_user_to_chatroom(user, "Lobby");
-                //controller.boot_user_to_lobby(user); 
     			main_page(user, main);
 
 			}
@@ -728,9 +758,6 @@ void Window::chatroom_window(User*user, WINDOW* main){
 		wrefresh(messageBox);
 		*/
 	}while(modeSwitch != 27);
-
-	getch();
-	endwin();
 }
 
 //

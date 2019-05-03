@@ -110,3 +110,7 @@ string View::already_in_lobby(){
 string View::cannot_delete_prompt(){
     return "You cannot delete chatroom with users in it. Only admin can do that.";
 }
+
+string View::cannot_delete_lobby(){
+    return "Lobby cannot be deleted.";
+} 

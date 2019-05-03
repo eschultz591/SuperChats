@@ -22,6 +22,7 @@ class View{
         string banned_prompt();
         string already_in_lobby();
         string cannot_delete_prompt();
+        string cannot_delete_lobby();
     private: 
         Server& server;
 };
