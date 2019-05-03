@@ -372,59 +372,164 @@ void Window::main_page(User* user, WINDOW* main){
                     
                     wgetstr(menu_grid, chatname);
                     do{
-                        
-                        //this validates whether the chatroom name already exists, or if 10 chatrooms has already been created.
-                        valid = controller.validate_chatname(chatname);
-                        if(valid == 2){
-                            mvwprintw(menu_grid, menu_height - 3, 2, view.chatname_already_exists().c_str());
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            wclrtoeol(menu_grid);
-                            box(menu_grid, 0, 0);
-                            wrefresh(menu_grid);
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            echo();
-                            wgetstr(menu_grid, chatname);
-                        }
-                        else if (valid == 3){
-                            mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_chatrooms_prompt().c_str());
-                            wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
-                            wclrtoeol(menu_grid);
-                            box(menu_grid, 0, 0);
-                            wrefresh(menu_grid);
+
+                        if(strcmp(chatname, "quit") == 0){
                             valid = 1;
-                        }
-                        else{
-                            controller.create_chatroom(chatname);
                             wmove(menu_grid, menu_height -3, 1);
                             wclrtoeol(menu_grid);
                             wmove(menu_grid, menu_height -2, 1);
                             wclrtoeol(menu_grid);
                             box(menu_grid, 0, 0);
                             wrefresh(menu_grid);
-                            display = view.view_chatrooms();
-                            mvwprintw(chatroom_grid, 2, 2, display.c_str());
-                            box(chatroom_grid, 0, 0);
-                            wrefresh(chatroom_grid);
+                        }
+                        else{
+                            valid = controller.validate_chatname(chatname);
+
+                        //chat already exists
+                            if(valid == 2){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.chatname_already_exists().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+
+                        //too many chat rooms
+                            else if (valid == 3){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.maxed_chatrooms_prompt().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                valid = 1;
+                            }
+
+                        //okay, create a chat
+                            else{
+                                controller.create_chatroom(chatname);
+                                wmove(menu_grid, menu_height -3, 1);
+                                wclrtoeol(menu_grid);
+                                wmove(menu_grid, menu_height -2, 1);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                display = view.view_chatrooms();
+                                mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                                box(chatroom_grid, 0, 0);
+                                wrefresh(chatroom_grid);
+                            }
                         }
                     }while(valid != 1);
                 }
                 //delete chat
                 else if (c == 51){
+                    char chatname[80];
                     bool user_status = user->getAdmin();
-                    int chat_exists = controller.validate_chatname(user->get_room());
-
+                    int valid;
+                    
+                    //set up menu box
                     wmove(menu_grid, menu_height -3, 1);
                     wclrtoeol(menu_grid);
                     wmove(menu_grid, menu_height -2, 1);
                     wclrtoeol(menu_grid);
                     box(menu_grid, 0, 0);
                     wrefresh(menu_grid);
-
-
-
+                    mvwprintw(menu_grid, menu_height - 2 , 2, view.chatroom_name_prompt().c_str());
+                    wrefresh(menu_grid);
+                    curs_set(true);
+                    wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                    echo();
                     
-                }
 
+                    wgetstr(menu_grid, chatname);
+                    do{
+                        //if user changes mind and doesn't want to delete
+                        if(strcmp(chatname, "quit") == 0){
+                            valid = 1;
+                            wmove(menu_grid, menu_height -3, 1);
+                            wclrtoeol(menu_grid);
+                            wmove(menu_grid, menu_height -2, 1);
+                            wclrtoeol(menu_grid);
+                            box(menu_grid, 0, 0);
+                            wrefresh(menu_grid);
+                    
+                        }
+                        else{
+                            //validate_chatname returns a 1 if no chatroom exists.
+                            int chat_exists = controller.validate_chatname(chatname);
+                            if(chat_exists == 1){
+                                mvwprintw(menu_grid, menu_height - 3, 2, view.chatroom_not_found_prompt().c_str());
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                wclrtoeol(menu_grid);
+                                box(menu_grid, 0, 0);
+                                wrefresh(menu_grid);
+                                wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                echo();
+                                wgetstr(menu_grid, chatname);
+                            }
+                            //the room does exist
+                            else{
+                                //if user is admin, he can delete any room. First user into Superchat is admin.
+                                if (user_status){
+                                    controller.remove_chatroom(chatname);
+                                    valid = 1;
+                                    wmove(menu_grid, menu_height -3, 1);
+                                    wclrtoeol(menu_grid);
+                                    wmove(menu_grid, menu_height -2, 1);
+                                    wclrtoeol(menu_grid);
+                                    box(menu_grid, 0, 0);
+                                    wrefresh(menu_grid);
+                                    display = view.view_chatrooms();
+                                    mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                                    box(chatroom_grid, 0, 0);
+                                    wrefresh(chatroom_grid);
+
+                                }
+                                // if he's not, room needs to be empty
+                                else{
+                                    int size;
+                                    for(auto&&x : server.get_chatrooms()){
+                                        if(x.first->get_name() == chatname){
+                                            size = x.second;
+                                            break;
+                                        }
+                                    }
+                                    //if there are people in the room, a normal user can't delete
+                                    if (size != 0){
+                                        mvwprintw(menu_grid, menu_height - 3, 2, view.cannot_delete_prompt().c_str());
+                                        wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                        wclrtoeol(menu_grid);
+                                        box(menu_grid, 0, 0);
+                                        wrefresh(menu_grid);
+                                        wmove(menu_grid, menu_height - 2, view.chatroom_name_prompt().size() + 2);
+                                        echo();
+                                        wgetstr(menu_grid, chatname);
+                                    }
+
+                                    //normal user can delete, since room is empty
+                                    else{
+                                        controller.remove_chatroom(chatname);
+                                        valid = 1;
+                                        wmove(menu_grid, menu_height -3, 1);
+                                        wclrtoeol(menu_grid);
+                                        wmove(menu_grid, menu_height -2, 1);
+                                        wclrtoeol(menu_grid);
+                                        box(menu_grid, 0, 0);
+                                        wrefresh(menu_grid);
+                                        display = view.view_chatrooms();
+                                        mvwprintw(chatroom_grid, 2, 2, display.c_str());
+                                        box(chatroom_grid, 0, 0);
+                                        wrefresh(chatroom_grid);
+                                    }
+                                }
+                            }
+                        }
+                    }while(valid != 1);
+                }
+                //edit username
                 else if (c == 52)
                 {
                     char new_username[80];
@@ -627,3 +732,5 @@ void Window::chatroom_window(User*user, WINDOW* main){
 	getch();
 	endwin();
 }
+
+//

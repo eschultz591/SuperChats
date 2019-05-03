@@ -10,7 +10,7 @@ class Controller{
         void user_to_mod();
         void create_chatroom(string);
         void add_user_to_chatroom(User*, string);
-        void remove_chatroom();
+        void remove_chatroom(string); 
         void create_lobby();
         void boot_users_to_lobby(Chatroom*);
         void boot_user_to_lobby(User*);

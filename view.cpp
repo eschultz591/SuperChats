@@ -106,3 +106,7 @@ string View::banned_prompt(){
 string View::already_in_lobby(){
     return "You are already in the lobby. Join a different chatroom.";
 }
+
+string View::cannot_delete_prompt(){
+    return "You cannot delete chatroom with users in it. Only admin can do that.";
+}

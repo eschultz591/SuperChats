@@ -167,43 +167,45 @@ void Controller::create_lobby(){
 }
 
 //Deletes users from chatroom, removes chatroom from server, then deletes chatroom object
-void Controller::remove_chatroom(){
-    string chatroom_name;
-    int position = 0;
-    bool foundChat = false;
-    view.chatroom_name_prompt();
-    cin >> chatroom_name;
+void Controller::remove_chatroom(string chatroom){
 
     for(auto x : server.get_chatrooms()){
-        if (x.first->get_name() == chatroom_name){
-            foundChat = true;
+        if (x.first->get_name() == chatroom){
             boot_users_to_lobby(x.first);
             server.remove_chatroom(x.first);
-            delete x.first;
-            
+            //delete x.first; line was throwing a memory leak
             break;
         }
     }
-    if(!foundChat){
-        view.chatroom_not_found_prompt();
-    }
 }
 
+//for clearing an entire chatroom, called when admin deletes room
 void Controller::boot_users_to_lobby(Chatroom* chatroom){
-    for(auto x : chatroom->get_current_users()){
-        auto_add_user_to_lobby(x);
+
+    //if the chatroom is not empty, pass boot every user
+    if(!chatroom->get_current_users().empty()){
+        for(auto x : chatroom->get_current_users()){
+            boot_user_to_lobby(x);
+        }
     }
+    
 }
+
+//for booting a single user, called when moderator boots
 void Controller::boot_user_to_lobby(User* user){
     
     for(auto&&x : server.get_chatrooms()){
         if (x.first->get_name() == user->get_room()){
             
             //this loop removes user from his current chatroom
-            for(auto&&y : x.first->get_current_users()){
+            for(auto y : x.first->get_current_users()){
                 if(y->getUsername() == user->getUsername()){
+
+                    //removes user from current room
                     x.first->remove_user(user->getUsername());
                     x.second--;
+
+                    //then adds user to lobby
                     auto_add_user_to_lobby(y);
                     break;
                 }
