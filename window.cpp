@@ -1,6 +1,8 @@
 #include "window.h"
 #include <string>
 #include <cstring>
+#include <ctime>
+#include <chrono>
 //global main window
 
 int main_height;
@@ -166,7 +168,7 @@ void Window::main_page(User* user, WINDOW* main){
         mvwprintw(menu_grid, i + 2, 1, choices[i].c_str());
         
     }*/
-    int i = 0;
+    int i = 0, j = 2;
     wrefresh(menu_grid);
     ostringstream output;
     noecho();
@@ -205,7 +207,25 @@ void Window::main_page(User* user, WINDOW* main){
                 wrefresh(input_box);
                 controller.add_message(message, user);
                 string messages = controller.display_messages(user);
-                mvwprintw(lobby_grid, 2, 2, messages.c_str());
+                //mvwprintw(lobby_grid, 2, 2, messages.c_str());
+                //Timestamp addition
+                time_t rawtime;
+                struct tm * timeinfo;
+                char buffer[80];
+
+                time (&rawtime);
+                timeinfo = localtime(&rawtime);
+
+                strftime(buffer,sizeof(buffer),"%m-%d-%Y %H:%M:%S",timeinfo);
+                std::string str(buffer);
+                string timeStamp = str;
+                //time stamp
+                mvwprintw(lobby_grid, j, 1, str.c_str());
+                //username
+                mvwprintw(lobby_grid, j, str.size()+2, user_colon.c_str());
+				//message
+                mvwprintw(lobby_grid, j, str.size()+user->getUsername().size()+4, message); //print what is being written in the messages window
+                wmove(lobby_grid, j++, 1);
                 box(lobby_grid, 0, 0);
                 box(input_box, 0, 0);
                 wrefresh(lobby_grid);
@@ -238,7 +258,7 @@ void Window::main_page(User* user, WINDOW* main){
                     }
                     int i = 0;
                     wrefresh(menu_grid);  
-                     menu_printed = 1;   
+                     menu_printed = 0;   
 
                     
                 
@@ -689,8 +709,19 @@ void Window::chatroom_window(User*user, WINDOW* main){
 				box(sendMessageBox, 0, 0);
 				wrefresh(sendMessageBox); //refresh to view blank screen
 				if(textString.front() != 9){
-					mvwprintw(messageBox, i, 1, userMessageName.c_str());
-					mvwprintw(messageBox, i, userMessageName.size()+1, text); //print what is being written in the messages window
+                    //Timestamp addition
+                    time_t rawtime;
+                    struct tm * timeinfo;
+                    char buffer[80];
+                    time (&rawtime);
+                    timeinfo = localtime(&rawtime);
+                    strftime(buffer,sizeof(buffer),"%m-%d-%Y %H:%M:%S",timeinfo);
+                    std::string str(buffer);
+                    string timeStamp = str;
+                    //time stamp
+                    mvwprintw(messageBox, i, 1, str.c_str());
+					mvwprintw(messageBox, i, str.size()+2, userMessageName.c_str());
+					mvwprintw(messageBox, i, str.size()+userMessageName.size()+2, text); //print what is being written in the messages window
 					wmove(messageBox, i++, 1);}
 				wrefresh(messageBox);
 			}
