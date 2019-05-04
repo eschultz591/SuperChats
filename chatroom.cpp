@@ -19,6 +19,10 @@ vector<User*> Chatroom::get_current_users(){
     return current_users;
 }
 
+vector<User*> Chatroom::get_banned_users(){
+    return banned_users; 
+}
+
 string Chatroom::to_string(){
     auto iter = current_users.begin();
     string s = "Chatroom Name: " + name + ", Users: ";
@@ -38,6 +42,10 @@ void Chatroom::increment_num_users(){
 
 void Chatroom::add_user(User* user){
     current_users.push_back(user);
+}
+
+void Chatroom::add_user_to_banned_list(User* user){
+    banned_users.push_back(user);
 }
 
 void Chatroom::remove_user(string username){

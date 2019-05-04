@@ -48,9 +48,8 @@ map<Chatroom*, int> &Server::get_chatrooms(){
     return chatrooms;
 } 
 
-//erases chatroom from server, but doesn't deallocate Users MUST FIX
+//erases chatroom from server
 void Server::remove_chatroom(Chatroom* chatroom){
-    users = chatroom->get_current_users();
     chatrooms.erase(chatroom);
     delete chatroom;
 } 

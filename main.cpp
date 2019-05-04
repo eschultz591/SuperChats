@@ -5,12 +5,11 @@ int main(){
     View view(server);
     Controller controller(server, view);
     //controller.setup();
-    //controller.interface();
+    //controller.interface();*/
 
 
     Window window(controller,server,view);
-    //window.start();
-    window.chatroom_window();
+    window.start();
     
 
 }
